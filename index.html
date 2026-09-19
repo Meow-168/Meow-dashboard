@@ -1,20 +1,23 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full w-full overflow-hidden">
+<html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>iPad Mini / Air Fullscreen Dashboard</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="智慧控制台">
+  <title>iPad Fullscreen Siri Dashboard</title>
   
   <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://tailwindcss.com"></script>
 
   <!-- Font Awesome Icons CDN -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cloudflare.com">
 
   <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://googleapis.com">
+  <link rel="preconnect" href="https://gstatic.com" crossorigin>
+  <link href="https://googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <style>
     * {
@@ -31,7 +34,7 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
-      background-color: #030712;
+      background-color: #02040a;
       color: #f3f4f6;
       font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
@@ -68,24 +71,42 @@
 
     /* Glassmorphism Panel */
     .glass-panel {
-      background: rgba(15, 23, 42, 0.65);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      background: rgba(13, 20, 38, 0.7);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
     }
 
     .glass-tile {
-      background: rgba(30, 41, 59, 0.5);
+      background: rgba(30, 41, 59, 0.4);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      transition: all 0.2s ease;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .glass-tile:active {
-      transform: scale(0.97);
-      background: rgba(51, 65, 85, 0.7);
+      transform: scale(0.96);
+      background: rgba(51, 65, 85, 0.6);
+    }
+
+    /* Siri Orb Wave Glowing Style */
+    .siri-glow-panel {
+      background: radial-gradient(circle at center, rgba(147, 51, 234, 0.1) 0%, rgba(59, 130, 246, 0.05) 50%, rgba(0, 0, 0, 0) 100%);
+    }
+
+    .siri-orb {
+      background: linear-gradient(135deg, #a855f7 0%, #3b82f6 40%, #ec4899 70%, #10b981 100%);
+      background-size: 200% 200%;
+      animation: siriWave 6s infinite alternate linear;
+      box-shadow: 0 0 35px rgba(168, 85, 247, 0.6), 0 0 70px rgba(59, 130, 246, 0.4);
+    }
+
+    @keyframes siriWave {
+      0% { background-position: 0% 50%; transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.05) rotate(180deg); blur: 2px; }
+      100% { background-position: 100% 50%; transform: scale(1) rotate(360deg); }
     }
 
     .neon-text-blue {
@@ -96,15 +117,6 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
-    /* Robot Vacuum Wheel Spin */
-    .spin-slow {
-      animation: spin 8s linear infinite;
-    }
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
     .weather-float {
       animation: floatWeather 4s ease-in-out infinite;
     }
@@ -112,695 +124,114 @@
       0%, 100% { transform: translateY(0px) scale(1); filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.4)); }
       50% { transform: translateY(-6px) scale(1.03); filter: drop-shadow(0 0 25px rgba(56, 189, 248, 0.7)); }
     }
-
-    /* Hide scrollbars */
-    ::-webkit-scrollbar {
-      width: 0px;
-      height: 0px;
-    }
   </style>
 </head>
-<body class="w-full h-full p-2 md:p-3 relative overflow-hidden">
+<body class="w-full h-full p-3 md:p-4 relative overflow-hidden select-none">
 
   <div class="bg-glow-1"></div>
   <div class="bg-glow-2"></div>
 
-  <!-- Main 4:3 Fullscreen Grid Container -->
-  <main class="w-full h-full grid grid-cols-2 grid-rows-2 gap-2.5 md:gap-3.5 z-10 relative">
+  <!-- 4:3 完美全螢幕主容器網格 -->
+  <main class="w-full h-full grid grid-cols-2 grid-rows-2 gap-3.5 md:gap-5 z-10 relative">
 
     <!-- ==========================================
          1. TOP-LEFT: LARGE CLOCK & BRITISH DATE
          ========================================== -->
-    <section class="glass-panel rounded-2xl md:rounded-3xl p-4 md:p-6 flex flex-col justify-between relative overflow-hidden group">
+    <section class="glass-panel rounded-3xl p-5 md:p-7 flex flex-col justify-between relative overflow-hidden">
       <div class="absolute -right-10 -top-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-      <!-- Top Utility Bar -->
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2 text-cyan-400 font-bold text-xs tracking-wider uppercase">
           <i class="fa-regular fa-clock text-sm"></i>
           <span>Live Clock</span>
         </div>
-        
-        <div class="flex items-center space-x-2">
-          <button id="wakeLockBtn" onclick="toggleWakeLock()" class="glass-tile px-2.5 py-1 rounded-full text-[11px] text-slate-300 flex items-center space-x-1 transition">
-            <i class="fa-solid fa-lightbulb text-amber-400"></i>
-            <span id="wakeLockText">Awake</span>
-          </button>
-          <button onclick="toggleFullScreen()" class="glass-tile p-1.5 rounded-full text-[11px] text-slate-300 transition">
-            <i class="fa-solid fa-expand"></i>
-          </button>
+        <div class="glass-tile px-3 py-1 rounded-full text-[11px] text-slate-300 flex items-center space-x-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="font-medium tracking-wide">iPad Pro Display</span>
         </div>
       </div>
 
-      <!-- Center Clock Body -->
       <div class="my-auto">
-        <!-- Prominent Weekday -->
-        <div id="dayOfWeek" class="text-2xl sm:text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-amber-500 tracking-wider uppercase">
+        <div id="dayOfWeek" class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-amber-500 tracking-wider uppercase">
           SATURDAY
         </div>
 
-        <!-- 12-Hour AM/PM Time -->
         <div class="flex items-baseline space-x-2 sm:space-x-3 my-1">
-          <h1 id="clockDisplay" class="text-5xl sm:text-6xl md:text-7xl font-extrabold font-mono-clock tracking-tight text-white neon-text-blue">
-            04:12
+          <h1 id="clockDisplay" class="text-6xl sm:text-7xl md:text-8xl font-black font-mono-clock tracking-tight text-white neon-text-blue">
+            00:00
           </h1>
-          <span id="ampmDisplay" class="text-xl sm:text-2xl font-extrabold text-cyan-400 font-mono-clock">
+          <span id="ampmDisplay" class="text-2xl sm:text-3xl font-extrabold text-cyan-400 font-mono-clock">
             PM
           </span>
         </div>
 
-        <!-- British Date: 19 SEPT -->
-        <div class="flex items-center space-x-2.5 text-xl sm:text-2xl font-extrabold text-slate-200">
-          <i class="fa-solid fa-calendar-day text-cyan-400 text-lg"></i>
+        <div class="flex items-center space-x-2.5 text-2xl sm:text-3xl font-black text-slate-200">
+          <i class="fa-solid fa-calendar-day text-cyan-400 text-xl"></i>
           <span id="britishDateDisplay" class="text-amber-300 font-mono-clock">19 SEPT</span>
-          <span id="fullDateSub" class="text-xs font-normal text-slate-400">/ 2026</span>
+          <span id="fullDateSub" class="text-sm font-normal text-slate-400">/ 2026</span>
         </div>
       </div>
 
-      <!-- Bottom Info Footer -->
-      <div class="flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-800/80 pt-2">
+      <div class="flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-800/80 pt-3">
         <span class="flex items-center gap-1.5">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span>iPad Fullscreen</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>System Stable</span>
         </span>
-        <span id="timezoneLabel" class="font-mono text-slate-500">HKT (UTC+8)</span>
+        <span class="font-mono text-slate-500">HKT (UTC+8)</span>
       </div>
     </section>
 
-
     <!-- ==========================================
-         2. TOP-RIGHT: REAL-TIME WEATHER
+         2. TOP-RIGHT: REAL-TIME WEATHER (HKO)
          ========================================== -->
-    <section class="glass-panel rounded-2xl md:rounded-3xl p-4 md:p-6 flex flex-col justify-between relative overflow-hidden">
-      <!-- Header -->
+    <section class="glass-panel rounded-3xl p-5 md:p-7 flex flex-col justify-between relative overflow-hidden">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-2 text-sky-400 font-bold text-xs tracking-wider uppercase">
           <i class="fa-solid fa-location-dot"></i>
-          <span id="locationName" class="text-slate-200">Hong Kong</span>
+          <span id="locationName" class="text-slate-200">Hong Kong Observatory</span>
         </div>
-
-        <div class="flex items-center space-x-2">
-          <button onclick="getUserLocation()" class="glass-tile p-1.5 rounded-full text-xs text-sky-400 transition" title="Auto GPS">
-            <i class="fa-solid fa-crosshairs"></i>
-          </button>
-          <button onclick="toggleCityModal()" class="glass-tile p-1.5 rounded-full text-xs text-slate-300 transition" title="Search City">
-            <i class="fa-solid fa-magnifying-glass"></i>
-          </button>
-        </div>
+        <div class="text-[10px] bg-sky-500/10 text-sky-400 px-2.5 py-0.5 rounded-full border border-sky-500/20 font-mono">Live API</div>
       </div>
 
-      <!-- Weather Temperature & Icon -->
       <div class="grid grid-cols-2 gap-2 my-auto items-center">
         <div class="flex flex-col">
           <div class="flex items-start">
-            <span id="currentTemp" class="text-5xl sm:text-6xl font-extrabold text-white tracking-tight">--</span>
-            <span class="text-2xl text-sky-400 font-light mt-1">°C</span>
+            <span id="currentTemp" class="text-6xl sm:text-7xl font-black text-white tracking-tight">--</span>
+            <span class="text-3xl font-bold text-sky-400 mt-1">°C</span>
           </div>
-          <div id="weatherCondition" class="text-base sm:text-lg font-semibold text-slate-200 mt-0.5">
-            Loading...
-          </div>
-          <div id="feelsLikeTemp" class="text-[11px] text-slate-400">
-            Feels: --°C
-          </div>
+          <div id="weatherCondition" class="text-base md:text-lg font-bold text-amber-400 mt-1">取得數據中...</div>
+          <div id="currentHumidity" class="text-xs md:text-sm text-slate-400 mt-0.5">相對濕度: --%</div>
         </div>
-
-        <div class="flex items-center justify-center">
-          <div id="weatherIconContainer" class="text-6xl sm:text-7xl text-sky-400 weather-float">
+        <div class="flex justify-center items-center">
+          <div id="weatherIconContainer" class="text-6xl sm:text-7xl md:text-8xl text-sky-400 weather-float">
             <i class="fa-solid fa-cloud-sun"></i>
           </div>
         </div>
       </div>
 
-      <!-- 4 Weather Metric Tiles -->
-      <div class="grid grid-cols-4 gap-1.5 border-t border-slate-800/80 pt-2 text-center">
-        <div class="glass-tile rounded-xl p-1.5">
-          <div class="text-[9px] uppercase text-slate-400 font-medium">Humidity</div>
-          <div id="humidityVal" class="text-xs font-bold text-slate-100">--%</div>
-        </div>
-        <div class="glass-tile rounded-xl p-1.5">
-          <div class="text-[9px] uppercase text-slate-400 font-medium">Rain</div>
-          <div id="precipVal" class="text-xs font-bold text-sky-300">--%</div>
-        </div>
-        <div class="glass-tile rounded-xl p-1.5">
-          <div class="text-[9px] uppercase text-slate-400 font-medium">Wind</div>
-          <div id="windSpeedVal" class="text-xs font-bold text-slate-100">-- km/h</div>
-        </div>
-        <div class="glass-tile rounded-xl p-1.5">
-          <div class="text-[9px] uppercase text-slate-400 font-medium">UV Index</div>
-          <div id="uvIndexVal" class="text-xs font-bold text-amber-300">--</div>
-        </div>
+      <div id="hkoWarningBox" class="text-xs font-semibold text-rose-400 border-t border-slate-800/80 pt-3 flex items-center gap-1.5 truncate">
+        <i class="fa-solid fa-triangle-exclamation animate-pulse"></i> 正在檢查特別天氣警告...
       </div>
     </section>
-
 
     <!-- ==========================================
-         3. BOTTOM-LEFT: HOME ASSISTANT + ECOVACS CONTROL
+         3. BOTTOM-LEFT: APPLE SIRI INTERFACE
          ========================================== -->
-    <section class="glass-panel rounded-2xl md:rounded-3xl p-3 md:p-4 flex flex-col justify-between relative overflow-hidden">
-      <!-- Section Header -->
-      <div class="flex items-center justify-between pb-2 border-b border-slate-800/80">
-        <div class="flex items-center space-x-2 text-amber-400 font-bold text-xs tracking-wider uppercase">
-          <i class="fa-solid fa-house-laptop"></i>
-          <span>Smart Home & Robot Vacuum</span>
+    <section class="glass-panel rounded-3xl p-5 md:p-7 flex flex-col justify-between relative overflow-hidden siri-glow-panel">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2 text-purple-400 font-bold text-xs tracking-wider uppercase">
+          <i class="fa-solid fa-microphone-lines text-sm"></i>
+          <span>Apple Siri Assistant</span>
         </div>
-        
-        <div class="flex items-center space-x-2">
-          <button onclick="toggleHaMode()" id="haModeBtn" class="text-[10px] bg-blue-600/80 hover:bg-blue-500 text-white px-2 py-0.5 rounded-full font-medium transition">
-            <i class="fa-solid fa-window-maximize"></i> <span id="haModeText">Show Embedded HA</span>
-          </button>
-          <button onclick="openHaSettings()" class="text-slate-400 hover:text-white text-xs p-1">
-            <i class="fa-solid fa-gear"></i>
-          </button>
-        </div>
+        <div class="text-[10px] bg-purple-500/10 text-purple-400 px-2.5 py-0.5 rounded-full border border-purple-500/20 font-mono">Voice Core</div>
       </div>
 
-      <!-- Dual Sub-Module Layout -->
-      <div id="subModuleContainer" class="flex-1 my-2 grid grid-cols-2 gap-2.5 overflow-hidden">
-        
-        <!-- SUB-MODULE 1: HOME ASSISTANT VIEW / TILE -->
-        <div id="haCardView" class="glass-tile rounded-xl p-3 flex flex-col justify-between relative overflow-hidden border border-blue-500/30">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-              <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-blue-600 to-cyan-400 text-white flex items-center justify-center text-base shadow">
-                <i class="fa-solid fa-house-signal"></i>
-              </div>
-              <div>
-                <div class="text-xs font-bold text-white">Home Assistant</div>
-                <div class="text-[10px] text-emerald-400 font-mono">● Connected</div>
-              </div>
-            </div>
-            
-            <a id="haExternalBtn" href="http://homeassistant.local:8123" target="_blank" class="text-slate-400 hover:text-cyan-300 text-xs p-1" title="Open in Browser">
-              <i class="fa-solid fa-arrow-up-right-from-square"></i>
-            </a>
-          </div>
+      <!-- Center Siri Orb Trigger -->
+      <div class="my-auto flex flex-col items-center justify-center gap-4">
+        <!-- 喚醒 Apple 原生捷徑/Siri 機制的觸發通道 -->
+        <a href="shortcuts://" class="w-24 h-24 rounded-full siri-orb flex items-center justify-center group active:scale-90 transition duration-300">
+          <i class="fa-solid fa-microphone text-white text-3xl group-hover:scale-110 transition"></i>
+        </a>
+        <div class="text-center">
+          <h2 class="text-base font-extrabold text-slate-200 tracking-wide">Tap to Speak</h2>
 
-          <!-- Embedded iframe / Direct launch trigger -->
-          <div id="haIframeWrapper" class="hidden w-full h-[100px] mt-2 rounded-lg overflow-hidden border border-slate-700 bg-slate-900">
-            <iframe id="haIframe" src="about:blank" class="w-full h-full border-0"></iframe>
-          </div>
-
-          <!-- HA Quick Actions -->
-          <div id="haQuickButtons" class="grid grid-cols-2 gap-1.5 mt-2">
-            <button onclick="launchApp('homeassistant://', 'ha')" class="glass-tile hover:bg-blue-600/30 p-2 rounded-lg text-center transition">
-              <i class="fa-solid fa-mobile-screen text-cyan-400 text-xs mb-0.5"></i>
-              <div class="text-[10px] font-bold text-slate-200">Open App</div>
-            </button>
-            <button onclick="launchApp('shortcuts://run-shortcut?name=HomeAssistant', 'ha')" class="glass-tile hover:bg-purple-600/30 p-2 rounded-lg text-center transition">
-              <i class="fa-solid fa-bolt text-purple-400 text-xs mb-0.5"></i>
-              <div class="text-[10px] font-bold text-slate-200">Siri Shortcut</div>
-            </button>
-          </div>
-
-          <div class="text-[9px] text-slate-400 mt-1 truncate">
-            URL: <span id="haUrlDisplay" class="text-slate-300 font-mono">http://homeassistant.local:8123</span>
-          </div>
-        </div>
-
-        <!-- SUB-MODULE 2: ECOVACS MOOPING / VACUUM ROBOT CONTROL -->
-        <div class="glass-tile rounded-xl p-3 flex flex-col justify-between relative overflow-hidden border border-teal-500/30">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-              <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-teal-600 to-emerald-400 text-white flex items-center justify-center text-base shadow">
-                <i class="fa-solid fa-robot spin-slow"></i>
-              </div>
-              <div>
-                <div class="text-xs font-bold text-white">ECOVACS Deebot</div>
-                <div id="robotStatusText" class="text-[10px] text-teal-300 font-mono">Standby • Ready</div>
-              </div>
-            </div>
-
-            <button onclick="openEcovacsGuide()" class="text-xs text-amber-400 hover:text-amber-300 p-1" title="HA Link Guide">
-              <i class="fa-solid fa-circle-question"></i>
-            </button>
-          </div>
-
-          <!-- Interactive Vacuum / Mop Controls -->
-          <div class="grid grid-cols-3 gap-1 my-1.5">
-            <button onclick="controlVacuum('start')" class="bg-emerald-600/80 hover:bg-emerald-500 text-white py-1.5 rounded-lg text-[10px] font-bold flex flex-col items-center justify-center gap-0.5 transition">
-              <i class="fa-solid fa-play"></i>
-              <span>Clean</span>
-            </button>
-            <button onclick="controlVacuum('pause')" class="bg-amber-600/80 hover:bg-amber-500 text-white py-1.5 rounded-lg text-[10px] font-bold flex flex-col items-center justify-center gap-0.5 transition">
-              <i class="fa-solid fa-pause"></i>
-              <span>Pause</span>
-            </button>
-            <button onclick="controlVacuum('dock')" class="bg-blue-600/80 hover:bg-blue-500 text-white py-1.5 rounded-lg text-[10px] font-bold flex flex-col items-center justify-center gap-0.5 transition">
-              <i class="fa-solid fa-house-chimney"></i>
-              <span>Dock</span>
-            </button>
-          </div>
-
-          <!-- Robot Metrics Bar -->
-          <div class="flex items-center justify-between text-[10px] border-t border-slate-700/60 pt-1.5">
-            <span class="flex items-center gap-1 text-slate-300">
-              <i class="fa-solid fa-droplet text-sky-400"></i>
-              <span id="mopWaterLevel">Mopping High</span>
-            </span>
-            <span class="flex items-center gap-1 text-emerald-400 font-mono font-bold">
-              <i class="fa-solid fa-battery-full"></i>
-              <span id="robotBattery">100%</span>
-            </span>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Footer Info -->
-      <div class="flex items-center justify-between text-[10px] text-slate-400 border-t border-slate-800/80 pt-1.5">
-        <span>Smart Home Dashboard Sync</span>
-        <button onclick="launchApp('ecovacs://', 'ecovacs')" class="text-teal-400 hover:underline flex items-center gap-1">
-          <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i> Ecovacs App
-        </button>
-      </div>
-    </section>
-
-
-    <!-- ==========================================
-         4. BOTTOM-RIGHT: 7-DAY WEATHER FORECAST
-         ========================================== -->
-    <section class="glass-panel rounded-2xl md:rounded-3xl p-4 md:p-5 flex flex-col justify-between relative overflow-hidden">
-      <!-- Header -->
-      <div class="flex items-center justify-between pb-2 border-b border-slate-800/80">
-        <div class="flex items-center space-x-2 text-sky-400 font-bold text-xs tracking-wider uppercase">
-          <i class="fa-solid fa-calendar-week"></i>
-          <span>7-Day Weather Forecast</span>
-        </div>
-        <button onclick="fetchWeatherData()" class="text-slate-400 hover:text-sky-300 text-xs transition flex items-center gap-1">
-          <i class="fa-solid fa-arrows-rotate"></i> Refresh
-        </button>
-      </div>
-
-      <!-- 7-Day Items Container -->
-      <div id="forecastContainer" class="my-auto space-y-1.5 overflow-y-auto max-h-[200px] pr-1">
-        <div class="text-center text-slate-400 py-6 text-xs">Fetching 7-Day Forecast...</div>
-      </div>
-
-      <!-- Footer -->
-      <div class="flex items-center justify-between text-[10px] text-slate-500 border-t border-slate-800/80 pt-1.5">
-        <span>Open-Meteo Weather Service</span>
-        <span>Auto Live Updates</span>
-      </div>
-    </section>
-
-  </main>
-
-
-  <!-- ==========================================
-       MODALS & SETTINGS
-       ========================================== -->
-
-  <!-- Home Assistant Settings Modal -->
-  <div id="haSettingsModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="glass-panel bg-slate-900 border border-slate-700 rounded-3xl p-6 max-w-md w-full shadow-2xl">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-gear text-cyan-400"></i> Home Assistant URL
-        </h3>
-        <button onclick="closeHaSettings()" class="text-slate-400 hover:text-white p-1">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <div class="space-y-3">
-        <div>
-          <label class="block text-xs text-slate-300 mb-1 font-semibold">Home Assistant Local Address / IP</label>
-          <input type="text" id="haUrlInput" placeholder="http://192.168.1.100:8123 or http://homeassistant.local:8123" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-cyan-500">
-        </div>
-
-        <div class="text-[11px] text-slate-400 bg-slate-800/50 p-2.5 rounded-xl border border-slate-700/60 leading-relaxed">
-          <i class="fa-solid fa-circle-info text-cyan-400 mr-1"></i>
-          If the embedded Web View shows a blank screen on iOS, ensure you allow HTTP/HTTPS or enable CORS in your Home Assistant <code class="text-amber-300 font-mono">configuration.yaml</code>.
-        </div>
-      </div>
-
-      <div class="mt-5 flex justify-end space-x-2">
-        <button onclick="closeHaSettings()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-xl text-xs transition">Cancel</button>
-        <button onclick="saveHaUrl()" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition">Save Settings</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Ecovacs HA Integration Guide Modal -->
-  <div id="ecovacsGuideModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="glass-panel bg-slate-900 border border-slate-700 rounded-3xl p-6 max-w-lg w-full shadow-2xl">
-      <div class="flex justify-between items-center mb-3">
-        <h3 class="text-base font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-robot text-teal-400"></i> Linking Ecovacs Robot to Dashboard
-        </h3>
-        <button onclick="closeEcovacsGuide()" class="text-slate-400 hover:text-white p-1">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <div class="space-y-2.5 text-xs text-slate-300 leading-relaxed overflow-y-auto max-h-[300px] pr-1">
-        <p><strong class="text-teal-300">Option 1: Direct App Launch</strong><br>Tap the "Ecovacs App" button on the card to launch the native Ecovacs iOS App via URL scheme.</p>
-
-        <p><strong class="text-teal-300">Option 2: Connect via Home Assistant Integration (Recommended)</strong><br>You can integrate your Ecovacs Deebot / Winbot into Home Assistant to control cleaning & mopping directly from this screen!</p>
-        
-        <ol class="list-decimal list-inside space-y-1 bg-slate-800/60 p-3 rounded-xl border border-slate-700 font-mono text-[11px] text-slate-200">
-          <li>Open your Home Assistant Dashboard.</li>
-          <li>Go to <strong>Settings ➔ Devices & Services</strong>.</li>
-          <li>Click <strong>Add Integration</strong> ➔ Search for <strong>Ecovacs Deebot</strong> (or install via HACS).</li>
-          <li>Log in with your Ecovacs Home account credentials.</li>
-          <li>Your mopping robot entity (e.g. <code class="text-amber-300">vacuum.deebot</code>) will now sync status & controls live!</li>
-        </ol>
-      </div>
-
-      <div class="mt-4 flex justify-end">
-        <button onclick="closeEcovacsGuide()" class="bg-teal-600 hover:bg-teal-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition">Got it</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- City Search Modal -->
-  <div id="cityModal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="glass-panel bg-slate-900 border border-slate-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-magnifying-glass text-sky-400"></i> Change City
-        </h3>
-        <button onclick="toggleCityModal()" class="text-slate-400 hover:text-white p-1">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-      <div class="space-y-3">
-        <input type="text" id="citySearchInput" placeholder="Enter City (e.g. London, Tokyo, Taipei)" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
-        <button onclick="searchCity()" class="w-full bg-sky-600 hover:bg-sky-500 text-white py-2 rounded-xl text-xs font-bold uppercase transition">
-          Apply Location
-        </button>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- JavaScript Functionality -->
-  <script>
-    let currentLat = 22.3193; // Default Hong Kong
-    let currentLon = 114.1694;
-    let currentCityName = "Hong Kong";
-    let wakeLock = null;
-    let haUrl = "http://homeassistant.local:8123";
-    let isHaIframeShown = false;
-
-    window.onload = function() {
-      // Load saved HA URL
-      const savedHaUrl = localStorage.getItem('ipad_dashboard_ha_url');
-      if (savedHaUrl) {
-        haUrl = savedHaUrl;
-      }
-      document.getElementById('haUrlDisplay').innerText = haUrl;
-      document.getElementById('haExternalBtn').href = haUrl;
-
-      // 1. Start Clock
-      updateClock();
-      setInterval(updateClock, 1000);
-
-      // 2. Fetch Initial Weather
-      getUserLocation();
-      setInterval(fetchWeatherData, 30 * 60 * 1000);
-    };
-
-    /* =========================================================================
-       1. CLOCK & BRITISH DATE
-       ========================================================================= */
-    function updateClock() {
-      const now = new Date();
-
-      let hours = now.getHours();
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      hours = hours % 12;
-      hours = hours ? hours : 12;
-      const formattedHours = String(hours).padStart(2, '0');
-
-      document.getElementById('clockDisplay').innerText = `${formattedHours}:${minutes}`;
-      document.getElementById('ampmDisplay').innerText = ampm;
-
-      const days = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
-      document.getElementById('dayOfWeek').innerText = days[now.getDay()];
-
-      const dayNum = now.getDate();
-      const monthShortNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEPT", "OCT", "NOV", "DEC"];
-      const monthShort = monthShortNames[now.getMonth()];
-
-      document.getElementById('britishDateDisplay').innerText = `${dayNum} ${monthShort}`;
-      document.getElementById('fullDateSub').innerText = `/ ${now.getFullYear()}`;
-    }
-
-    async function toggleWakeLock() {
-      try {
-        if ('wakeLock' in navigator) {
-          if (!wakeLock) {
-            wakeLock = await navigator.wakeLock.request('screen');
-            document.getElementById('wakeLockText').innerText = "Awake";
-            document.getElementById('wakeLockBtn').classList.add('bg-amber-500/20', 'border-amber-500/50');
-          } else {
-            await wakeLock.release();
-            wakeLock = null;
-            document.getElementById('wakeLockText').innerText = "Awake";
-            document.getElementById('wakeLockBtn').classList.remove('bg-amber-500/20', 'border-amber-500/50');
-          }
-        }
-      } catch (err) {
-        console.log("WakeLock error:", err);
-      }
-    }
-
-    function toggleFullScreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(e => console.log(e));
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-      }
-    }
-
-    /* =========================================================================
-       2. HOME ASSISTANT & ECOVACS LOGIC
-       ========================================================================= */
-    function toggleHaMode() {
-      isHaIframeShown = !isHaIframeShown;
-      const iframeWrapper = document.getElementById('haIframeWrapper');
-      const quickButtons = document.getElementById('haQuickButtons');
-      const iframe = document.getElementById('haIframe');
-      const btnText = document.getElementById('haModeText');
-
-      if (isHaIframeShown) {
-        iframe.src = haUrl;
-        iframeWrapper.classList.remove('hidden');
-        quickButtons.classList.add('hidden');
-        btnText.innerText = "Show Quick Launch";
-      } else {
-        iframeWrapper.classList.add('hidden');
-        quickButtons.classList.remove('hidden');
-        btnText.innerText = "Show Embedded HA";
-      }
-    }
-
-    function openHaSettings() {
-      document.getElementById('haUrlInput').value = haUrl;
-      document.getElementById('haSettingsModal').classList.remove('hidden');
-    }
-
-    function closeHaSettings() {
-      document.getElementById('haSettingsModal').classList.add('hidden');
-    }
-
-    function saveHaUrl() {
-      const val = document.getElementById('haUrlInput').value.trim();
-      if (val) {
-        haUrl = val;
-        localStorage.setItem('ipad_dashboard_ha_url', haUrl);
-        document.getElementById('haUrlDisplay').innerText = haUrl;
-        document.getElementById('haExternalBtn').href = haUrl;
-        if (isHaIframeShown) {
-          document.getElementById('haIframe').src = haUrl;
-        }
-      }
-      closeHaSettings();
-    }
-
-    function launchApp(appUri, appType) {
-      window.location.href = appUri;
-      setTimeout(() => {
-        if (appType === 'ha') {
-          window.open(haUrl, '_blank');
-        } else if (appType === 'ecovacs') {
-          openEcovacsGuide();
-        }
-      }, 1200);
-    }
-
-    function controlVacuum(action) {
-      const statusText = document.getElementById('robotStatusText');
-      if (action === 'start') {
-        statusText.innerText = "Mopping & Vacuuming...";
-        statusText.className = "text-[10px] text-emerald-400 font-mono animate-pulse";
-      } else if (action === 'pause') {
-        statusText.innerText = "Paused";
-        statusText.className = "text-[10px] text-amber-300 font-mono";
-      } else if (action === 'dock') {
-        statusText.innerText = "Returning to Dock...";
-        statusText.className = "text-[10px] text-blue-400 font-mono";
-      }
-    }
-
-    function openEcovacsGuide() {
-      document.getElementById('ecovacsGuideModal').classList.remove('hidden');
-    }
-
-    function closeEcovacsGuide() {
-      document.getElementById('ecovacsGuideModal').classList.add('hidden');
-    }
-
-    /* =========================================================================
-       3. WEATHER LOGIC
-       ========================================================================= */
-    function getUserLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            currentLat = pos.coords.latitude;
-            currentLon = pos.coords.longitude;
-            currentCityName = "Current Location";
-            fetchWeatherData();
-          },
-          () => fetchWeatherData()
-        );
-      } else {
-        fetchWeatherData();
-      }
-    }
-
-    async function fetchWeatherData() {
-      try {
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&current_weather=true&hourly=relativehumidity_2m,precipitation_probability,uv_index&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto`;
-        const res = await fetch(url);
-        const data = await res.json();
-        updateCurrentWeatherUI(data);
-        updateForecastUI(data);
-      } catch (e) {
-        console.error("Weather error:", e);
-      }
-    }
-
-    function updateCurrentWeatherUI(data) {
-      const current = data.current_weather;
-      const temp = Math.round(current.temperature);
-      const code = current.weathercode;
-      const wind = Math.round(current.windspeed);
-
-      document.getElementById('locationName').innerText = currentCityName;
-      document.getElementById('currentTemp').innerText = temp;
-      document.getElementById('feelsLikeTemp').innerText = `Feels: ${temp}°C`;
-      document.getElementById('windSpeedVal').innerText = `${wind} km/h`;
-
-      const humidity = data.hourly?.relativehumidity_2m ? data.hourly.relativehumidity_2m[0] : 70;
-      document.getElementById('humidityVal').innerText = `${humidity}%`;
-
-      const precip = data.daily?.precipitation_probability_max ? data.daily.precipitation_probability_max[0] : 0;
-      document.getElementById('precipVal').innerText = `${precip}%`;
-
-      const uv = data.hourly?.uv_index ? Math.round(data.hourly.uv_index[0]) : 4;
-      document.getElementById('uvIndexVal').innerText = `${uv}`;
-
-      const meta = getWeatherMeta(code);
-      document.getElementById('weatherCondition').innerText = meta.label;
-      document.getElementById('weatherIconContainer').innerHTML = `<i class="${meta.icon}"></i>`;
-    }
-
-    function updateForecastUI(data) {
-      const container = document.getElementById('forecastContainer');
-      container.innerHTML = '';
-
-      if (!data.daily || !data.daily.time) return;
-
-      const days = data.daily.time;
-      const maxTemps = data.daily.temperature_2m_max;
-      const minTemps = data.daily.temperature_2m_min;
-      const codes = data.daily.weathercode;
-      const precips = data.daily.precipitation_probability_max;
-
-      const weekdaysShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-      days.forEach((dateStr, idx) => {
-        const dateObj = new Date(dateStr);
-        const dayName = weekdaysShort[dateObj.getDay()];
-        const dayNum = dateObj.getDate();
-        const monthNum = dateObj.getMonth() + 1;
-        const isToday = idx === 0;
-
-        const maxT = Math.round(maxTemps[idx]);
-        const minT = Math.round(minTemps[idx]);
-        const precip = precips ? precips[idx] : 0;
-        const meta = getWeatherMeta(codes[idx]);
-
-        const row = document.createElement('div');
-        row.className = `p-2 rounded-xl ${isToday ? 'bg-sky-500/20 border border-sky-500/30' : 'glass-tile'} flex items-center justify-between text-xs`;
-
-        row.innerHTML = `
-          <div class="flex items-center space-x-2 min-w-[85px]">
-            <span class="font-bold ${isToday ? 'text-sky-300' : 'text-slate-200'}">${isToday ? 'Today' : dayName}</span>
-            <span class="text-[10px] text-slate-400">${dayNum}/${monthNum}</span>
-          </div>
-
-          <div class="flex items-center space-x-2 flex-1 justify-center">
-            <i class="${meta.icon} text-sm"></i>
-            <span class="text-[11px] text-slate-300 hidden sm:inline">${meta.short}</span>
-          </div>
-
-          <div class="flex items-center space-x-2 justify-end min-w-[90px]">
-            <span class="text-[10px] text-sky-400 font-mono"><i class="fa-solid fa-droplet text-[9px]"></i> ${precip}%</span>
-            <div class="font-mono text-right text-[11px]">
-              <span class="font-bold text-white">${maxT}°</span>
-              <span class="text-slate-400 text-[10px]">/${minT}°</span>
-            </div>
-          </div>
-        `;
-
-        container.appendChild(row);
-      });
-    }
-
-    function toggleCityModal() {
-      document.getElementById('cityModal').classList.toggle('hidden');
-    }
-
-    async function searchCity() {
-      const city = document.getElementById('citySearchInput').value.trim();
-      if (!city) return;
-
-      try {
-        const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`;
-        const res = await fetch(geoUrl);
-        const data = await res.json();
-
-        if (data.results && data.results.length > 0) {
-          const loc = data.results[0];
-          currentLat = loc.latitude;
-          currentLon = loc.longitude;
-          currentCityName = `${loc.name}, ${loc.country_code ? loc.country_code.toUpperCase() : ''}`;
-          fetchWeatherData();
-          toggleCityModal();
-        } else {
-          alert('City not found.');
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    }
-
-    function getWeatherMeta(code) {
-      if (code === 0) return { label: 'Clear Sky', short: 'Clear', icon: 'fa-solid fa-sun text-amber-400' };
-      if (code === 1 || code === 2) return { label: 'Partly Cloudy', short: 'Partly Cloudy', icon: 'fa-solid fa-cloud-sun text-sky-300' };
-      if (code === 3) return { label: 'Overcast', short: 'Overcast', icon: 'fa-solid fa-cloud text-slate-400' };
-      if (code >= 45 && code <= 48) return { label: 'Foggy', short: 'Fog', icon: 'fa-solid fa-smog text-slate-400' };
-      if (code >= 51 && code <= 55) return { label: 'Drizzle', short: 'Drizzle', icon: 'fa-solid fa-cloud-rain text-sky-400' };
-      if (code >= 61 && code <= 65) return { label: 'Rain Showers', short: 'Rain', icon: 'fa-solid fa-cloud-showers-heavy text-blue-400' };
-      if (code >= 80 && code <= 82) return { label: 'Heavy Showers', short: 'Heavy Rain', icon: 'fa-solid fa-cloud-showers-water text-blue-500' };
-      if (code >= 95) return { label: 'Thunderstorm', short: 'Thunderstorm', icon: 'fa-solid fa-bolt text-amber-300' };
-      return { label: 'Partly Cloudy', short: 'Cloudy', icon: 'fa-solid fa-cloud-sun text-sky-300' };
-    }
-  </script>
-</body>
-</html>
