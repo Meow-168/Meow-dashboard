@@ -2,246 +2,288 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>iPad Mini Home Dashboard</title>
+    <meta name="apple-mobile-web-app-title" content="智慧家居控制">
+    <title>Modern iPad Home Dashboard</title>
     
     <style>
-        html, body {
+        /* 現代 iOS 頂級暗黑控制台風格 */
+        body {
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #050507; /* 更深邃的黑 */
+            width: 100vw;
+            height: 100vh;
+            background-color: #08080a;
             color: #ffffff;
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             overflow: hidden;
             box-sizing: border-box;
         }
 
-        .card {
-            position: absolute;
-            background-color: #121214;
-            border-radius: 16px;
+        /* 2x2 網格佈局：完全填滿 iPad 螢幕 */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1.2fr 0.8fr; /* 時鐘大格，App 細格 */
+            gap: 25px;
+            width: 100%;
+            height: 100%;
+            padding: 40px 25px 25px 25px; /* 頂部留空給 iOS 狀態列 */
             box-sizing: border-box;
-            padding: 20px;
-            border: 1px solid #232326;
         }
 
-        /* 左上：炫彩大時鐘格 (62% 高度) */
-        .left-top {
-            left: 2%;
-            top: 4%;
-            width: 46%;
-            height: 62%;
-            text-align: center;
-            display: block;
+        /* 精緻卡片設計（毛玻璃微光質感） */
+        .card {
+            background-color: #16161a;
+            border-radius: 20px;
+            border: 1px solid #282830;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
-        .clock-container {
-            position: relative;
-            top: 50%;
-            transform: translateY(-50%);
-            -webkit-transform: translateY(-50%); /* 相容 iOS 9 */
+
+        /* 左上：炫彩霓虹大時鐘 */
+        .time-box {
+            align-items: center;
+            background: linear-gradient(145deg, #111115, #1a1a22);
         }
         #date {
-            font-size: 2.2rem; /* 字體加大 */
-            color: #8e8e93;
+            font-size: 2.2rem;
+            color: #a1a1aa;
             font-weight: 300;
             letter-spacing: 1px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
-        #time-box {
-            font-size: 5rem; /* 超特大字體 */
-            font-weight: bold;
-            color: #30d158; 
-            /* 霓虹綠發光特效，讓畫面生動不沉悶 */
-            text-shadow: 0 0 12px rgba(48, 209, 88, 0.6), 0 0 25px rgba(48, 209, 88, 0.3);
+        .clock-display {
+            display: flex;
+            align-items: baseline;
+        }
+        #time {
+            font-size: 6rem; /* 現代螢幕特大字體 */
+            font-weight: 700;
+            color: #30d158; /* 蘋果綠 */
             letter-spacing: -2px;
+            /* 進階多層發光效果 */
+            text-shadow: 0 0 15px rgba(48, 209, 88, 0.5), 0 0 30px rgba(48, 209, 88, 0.2);
         }
         #ampm {
-            font-size: 1.5rem;
-            color: #545456;
-            margin-left: 5px;
-            font-weight: normal;
-            text-shadow: none;
+            font-size: 1.8rem;
+            color: #52525b;
+            margin-left: 10px;
+            font-weight: 600;
         }
 
-        /* 左下：細格智慧家居 APP (26% 高度) */
-        .left-bottom {
-            left: 2%;
-            top: 70%;
-            width: 46%;
-            height: 26%;
-            padding: 10px;
+        /* 左下：細格智慧家居 APP（緊湊排版） */
+        .apps-box {
+            justify-content: space-between;
+        }
+        .section-title {
+            font-size: 1.2rem;
+            color: #a1a1aa;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        .app-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            flex-grow: 1;
         }
         .app-btn {
-            float: left;
-            width: 45%;
-            height: 85%;
-            margin: 2% 2.5%;
-            background: linear-gradient(145deg, #1c1c1e, #2c2c2e); /* 漸層質感 */
-            border-radius: 12px;
+            background: linear-gradient(135deg, #22222a, #2a2a35);
+            border: 1px solid #3f3f46;
+            border-radius: 16px;
             text-decoration: none;
             color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .app-btn:active {
+            transform: scale(0.96);
+            background: #3f3f46;
+        }
+        .app-icon { font-size: 2.2rem; }
+        .app-text { font-size: 1rem; font-weight: bold; }
+
+        /* 右上與右下：兩格均分的天氣區塊 */
+        .weather-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+        #hk-temp {
+            font-size: 5rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .weather-info {
+            display: flex;
+            flex-direction: column;
+        }
+        #hk-weather-text {
+            font-size: 1.6rem;
+            color: #ff9500; /* 亮橘色 */
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+        #hk-humidity {
+            font-size: 1.1rem;
+            color: #a1a1aa;
+        }
+        #hk-warning {
+            font-size: 1rem;
+            color: #ff453a;
+            font-weight: bold;
+            margin-top: 10px;
             text-align: center;
-            border: 1px solid #3a3a3c;
-        }
-        .app-btn:active { background: #3a3a3c; }
-        .app-icon { font-size: 2rem; display: block; margin-top: 6px; }
-        .app-text { font-size: 0.9rem; font-weight: bold; color: #ffffff; display: block; margin-top: 4px; }
-
-        /* 右上與右下：兩格完美平分 (各佔 44% 高度) */
-        .right-top {
-            left: 52%;
-            top: 4%;
-            width: 46%;
-            height: 44%;
-        }
-        .right-bottom {
-            left: 52%;
-            top: 52%;
-            width: 46%;
-            height: 44%;
         }
 
-        /* 天氣板塊排版 */
-        .weather-title { font-size: 1.1rem; color: #aeaeb2; font-weight: bold; margin-bottom: 12px; }
-        #current-temp { font-size: 3.5rem; font-weight: bold; color: #ff9500; float: left; width: 45%; text-align: center; }
-        #current-cond { font-size: 1.3rem; color: #ffffff; font-weight: bold; margin-top: 8px; }
-        #current-details { font-size: 0.95rem; color: #aeaeb2; margin-top: 4px; }
-        
-        .forecast-item { width: 100%; border-bottom: 1px solid #232326; padding: 8px 0; font-size: 0.95rem; clear: both; }
-        .fc-day { float: left; width: 25%; color: #ffffff; font-weight: bold; }
-        .fc-text { float: left; width: 45%; color: #ff9500; }
-        .fc-temp { float: right; width: 30%; text-align: right; color: #aeaeb2; }
+        /* 天氣預報列表排版 */
+        .forecast-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 5px;
+        }
+        .forecast-item {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1fr;
+            align-items: center;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #282830;
+            padding-bottom: 8px;
+        }
+        .forecast-item:last-child { border-bottom: none; }
+        .fc-day { font-weight: bold; color: #ffffff; }
+        .fc-text { color: #ff9500; font-size: 1.05rem; }
+        .fc-temp { text-align: right; color: #a1a1aa; }
         .fc-high { color: #ff453a; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- 左上：大時鐘（英式日期 + 霓虹效果） -->
-    <div class="card left-top">
-        <div class="clock-container">
+    <div class="dashboard">
+        <!-- 左上：大時鐘（英式日期 + 霓虹綠效果） -->
+        <div class="card time-box">
             <div id="date">19 Sept</div>
-            <div id="time-box"><span id="time">00:00</span><span id="ampm">AM</span></div>
+            <div class="clock-display">
+                <span id="time">00:00</span>
+                <span id="ampm">AM</span>
+            </div>
         </div>
-    </div>
 
-    <!-- 左下：智慧家居 APP 按鈕（相容 iOS 9 最強語法） -->
-    <div class="card left-bottom">
-        <!-- 如果 App 開不起，請在 iPad 瀏覽器點擊，iOS 會彈出詢問是否開啟 -->
-        <a href="homeassistant://app" class="app-btn">
-            <span class="app-icon">🏠</span>
-            <span class="app-text">HA</span>
-        </a>
-        <a href="ecovacs://main" class="app-btn">
-            <span class="app-icon">🤖</span>
-            <span class="app-text">Ecovacs</span>
-        </a>
-    </div>
-
-    <!-- 右上：即時天氣（包含下雨/狀況顯示） -->
-    <div class="card right-top">
-        <div class="weather-title">即時天氣狀況</div>
-        <div id="current-temp">--°</div>
-        <div style="float: right; width: 55%;">
-            <div id="current-cond">讀取中...</div>
-            <div id="current-details">濕度: -- | 風速: --</div>
+        <!-- 右上：香港天文台即時天氣 -->
+        <div class="card">
+            <div class="section-title" style="margin-bottom: 5px;">香港地區即時天氣</div>
+            <div class="weather-main">
+                <div id="hk-temp">--°</div>
+                <div class="weather-info">
+                    <div id="hk-weather-text">正在連線...</div>
+                    <div id="hk-humidity">相對濕度: --%</div>
+                </div>
+            </div>
+            <div id="hk-warning"></div>
         </div>
-    </div>
 
-    <!-- 右下：一星期天氣預測（兩格均分） -->
-    <div class="card right-bottom">
-        <div class="weather-title">本週天氣預報</div>
-        <div id="forecast-box">
-            <div style="color:#aeaeb2; font-size:0.95rem;">正在更新預測...</div>
+        <!-- 左下：細格智慧家居 APP（支援現代 iOS 跳轉） -->
+        <div class="card apps-box">
+            <div class="section-title">快捷面板控制</div>
+            <div class="app-grid">
+                <a href="homeassistant://" class="app-btn">
+                    <span class="app-icon">🏠</span>
+                    <span class="app-text">Home Assistant</span>
+                </a>
+                <a href="ecovacs://" class="app-btn">
+                    <span class="app-icon">🤖</span>
+                    <span class="app-text">Ecovacs Home</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 右下：香港天文台一星期預測 -->
+        <div class="card">
+            <div class="section-title">香港九天天氣預報</div>
+            <div class="forecast-list" id="hk-forecast-box">
+                <div style="color:#a1a1aa; font-size:1.1rem;">正在讀取天文台數據...</div>
+            </div>
         </div>
     </div>
 
     <script>
-        // 1. 英式日期與大時鐘邏輯
-        var shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        // 1. 現代系統專用時鐘邏輯（英式日期 19 Sept）
+        const shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         
         function updateClock() {
-            var now = new Date();
+            const now = new Date();
             
             // 設定英式日期格式: 19 Sept
-            var dateStr = now.getDate() + " " + shortMonths[now.getMonth()];
-            document.getElementById('date').innerText = dateStr;
+            document.getElementById('date').innerText = now.getDate() + " " + shortMonths[now.getMonth()];
             
-            // 時間與補零
-            var hours = now.getHours();
-            var mins = now.getMinutes();
-            var minutesStr = mins < 10 ? '0' + mins : mins;
-            var ampmStr = hours >= 12 ? 'PM' : 'AM';
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
             
             hours = hours % 12;
             hours = hours ? hours : 12; 
             
-            document.getElementById('time').innerText = hours + ":" + minutesStr;
-            document.getElementById('ampm').innerText = ampmStr;
+            document.getElementById('time').innerText = `${hours}:${minutes}`;
+            document.getElementById('ampm').innerText = ampm;
         }
         setInterval(updateClock, 1000);
         updateClock();
 
 
-        // 2. 免阻擋全新天氣 API 讀取 (wttr.in)
-        function getWeatherData() {
-            // 讀取香港地區的 JSON 天氣數據
-            fetch('https://wttr.in')
-                .then(function(res) { return res.json(); })
-                .then(function(data) {
-                    // A. 即時天氣
-                    var current = data.current_condition[0];
-                    document.getElementById('current-temp').innerText = current.temp_C + "°";
-                    
-                    // 取得中文天氣狀態（例如：下雨、晴天）
-                    if(current.lang_zh && current.lang_zh.length > 0) {
-                        document.getElementById('current-cond').innerText = current.lang_zh[0].value;
-                    } else {
-                        document.getElementById('current-cond').innerText = current.weatherDesc[0].value;
+        // 2. 香港天文台官方 API 直接串接（無跨域阻擋問題）
+        function getHKOWeather() {
+            const currentUrl = 'https://weather.gov.hk';
+            const forecastUrl = 'https://weather.gov.hk';
+
+            // A. 讀取即時溫度與下雨狀況
+            fetch(currentUrl)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.temperature && data.temperature.data) {
+                        document.getElementById('hk-temp').innerText = `${data.temperature.data[0].value}°`;
                     }
-                    document.getElementById('current-details').innerText = "濕度: " + current.humidity + "% | 風速: " + current.windspeedKmph + "km/h";
-
-                    // B. 一週預測 (顯示接下來 3 天，完美填滿右下格)
-                    var forecastBox = document.getElementById('forecast-box');
-                    forecastBox.innerHTML = '';
+                    if(data.humidity && data.humidity.data) {
+                        document.getElementById('hk-humidity').innerText = `相對濕度: ${data.humidity.data[0].value}%`;
+                    }
                     
-                    var daysOfWeek = ["週日", "週一", "週二", "週三", "週四", "週五", "週六"];
-                    
-                    for(var i = 1; i <= 3; i++) {
-                        var fDay = data.weather[i];
-                        var fDate = new Date(fDay.date);
-                        var dayName = daysOfWeek[fDate.getDay()];
-                        
-                        // 預測的天氣狀況
-                        var condText = "多雲";
-                        if(fDay.hourly && fDay.hourly[4]) {
-                            var midDay = fDay.hourly[4]; // 中午的天氣
-                            condText = (midDay.lang_zh && midDay.lang_zh[0]) ? midDay.lang_zh[0].value : midDay.weatherDesc[0].value;
-                        }
-                        
-                        var maxT = fDay.maxtempC;
-                        var minT = fDay.mintempC;
+                    // 從天文台的天氣照片或文字報告中自動識別當前狀態（下雨、晴天等）
+                    let conditionText = "多雲";
+                    if (data.rainfall && data.rainfall.data && data.rainfall.data[0].max > 0) {
+                        conditionText = "有雨";
+                    } else if (data.icon && data.icon[0]) {
+                        // 簡單將天文台圖標轉換為常用文字
+                        const icon = data.icon[0];
+                        if (icon >= 50 && icon <= 54) conditionText = "有雨";
+                        else if (icon >= 62 && icon <= 65) conditionText = "少雲/晴朗";
+                        else conditionText = "陰天/多雲";
+                    }
+                    document.getElementById('hk-weather-text').innerText = conditionText;
 
-                        var item = document.createElement('div');
-                        item.className = 'forecast-item';
-                        item.innerHTML = 
-                            '<div class="fc-day">' + dayName + '</div>' +
-                            '<div class="fc-text">' + condText + '</div>' +
-                            '<div class="fc-temp"><span class="fc-high">' + maxT + '°</span> / ' + minT + '°</div>';
-                        
-                        forecastBox.appendChild(item);
+                    // 天氣警告摘要
+                    const warningBox = document.getElementById('hk-warning');
+                    if(data.warningMessage && data.warningMessage.length > 0) {
+                        warningBox.innerText = `⚠️ ${data.warningMessage[0]}`;
+                    } else {
+                        warningBox.innerText = "✅ 當前無任何天氣警告";
                     }
                 })
-                .catch(function() {
-                    document.getElementById('current-cond').innerText = "天氣連線稍候...";
+                .catch(() => {
+                    document.getElementById('hk-weather-text').innerText = "連線稍候...";
                 });
-        }
 
-        getWeatherData();
-        setInterval(getWeatherData, 1800000); // 每 30 分鐘自動更新
-    </script>
-</body>
-</html>
+            // B. 讀取九天天氣預報（精選 4 天，完美填滿右下格）
+            fetch(forecastUrl)
+                .then(res => res.json())
+                .then(data => {
+                    if(data.weatherForecast) {
