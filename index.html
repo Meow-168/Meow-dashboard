@@ -1,916 +1,298 @@
 <!DOCTYPE html>
-<html lang="zh-HK">
+<html lang="zh-TW">
 <head>
-   <meta charset="UTF-8">
-    
-    <!-- 1. 強制滿版，禁止使用者用雙指縮放畫面，保持 App 的固定控制台質感 -->
+    <meta charset="UTF-8">
+    <!-- 關鍵設定：強制滿版、禁止縮放，鎖定為 iPad Mini App 體驗 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <!-- 2. 核心：告訴 iPad 這是一個可以變成 App 的網頁（會隱藏 Safari 網址列與工具列） -->
     <meta name="apple-mobile-web-app-capable" content="yes">
-    
-    <!-- 3. 設定 iPad 頂部狀態列（電量、時間那行）的樣式：black-translucent 會讓網頁填滿到最頂端 -->
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="智慧家居控制台">
+    <title>iPad Mini Dashboard</title>
     
-    <!-- 4. 設定加到主畫面時，App 圖標下方的名稱 -->
-    <meta name="apple-mobile-web-app-title" content="點卦控制台">
+    <style>
+        /* 基礎全螢幕與防捲動設定 */
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000000; /* 極致黑底，融為一體 */
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
 
-    <title>易經點卦 Dashboard</title>
-  
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>iPad Mini Dashboard</title>
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+        /* 網格佈局：左右 1:1，上下 1:1，完美適應 iPad Mini 比例 */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            height: 100%;
+            padding: 30px 20px 20px 20px; /* 頂部預留空間給 iOS 狀態列 */
+            box-sizing: border-box;
+        }
 
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        /* 每個卡片的精緻樣式 */
+        .card {
+            background-color: #1c1c1e;
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
 
-  <!-- Google Fonts: Inter -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+        /* 左上：日期與時間 */
+        .time-box {
+            justify-content: center;
+        }
+        #date {
+            font-size: 1.5rem;
+            color: #aeaeb2;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        #time {
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: #34c759; /* 科技綠 */
+        }
 
-  <style>
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: radial-gradient(circle at top left, #1e293b, #0f172a, #020617);
-      color: #f8fafc;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-    }
+        /* 右上：當天天氣 */
+        .current-weather {
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .weather-main {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        #current-temp {
+            font-size: 4rem;
+            font-weight: 600;
+        }
+        #weather-info {
+            font-size: 1.2rem;
+            color: #aeaeb2;
+            line-height: 1.5;
+        }
 
-    /* Glassmorphism Styling */
-    .glass-card {
-      background: rgba(30, 41, 59, 0.55);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    }
+        /* 左下：App 快捷鍵 */
+        .apps-box {
+            justify-content: space-around;
+        }
+        .apps-title {
+            font-size: 1.1rem;
+            color: #aeaeb2;
+            margin-bottom: 10px;
+        }
+        .app-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            flex-grow: 1;
+        }
+        .app-btn {
+            background-color: #2c2c2e;
+            border-radius: 12px;
+            text-decoration: none;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .app-btn:active {
+            background-color: #3a3a3c;
+        }
+        .app-icon {
+            font-size: 2rem;
+        }
 
-    .glass-card-hover {
-      transition: all 0.25s ease;
-    }
-    .glass-card-hover:hover {
-      background: rgba(30, 41, 59, 0.75);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    /* Custom Scrollbars */
-    ::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
-    }
-    ::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.6);
-      border-radius: 8px;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.4);
-    }
-
-    /* Weather Pulse Effect */
-    .weather-pulse {
-      animation: pulse 3s infinite alternate;
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.3)); }
-      100% { transform: scale(1.05); filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.6)); }
-    }
-
-    /* Range Slider Styling */
-    input[type=range] {
-      -webkit-appearance: none;
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 8px;
-      height: 6px;
-    }
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      height: 16px;
-      width: 16px;
-      border-radius: 50%;
-      background: #ffffff;
-      box-shadow: 0 0 8px rgba(0,0,0,0.5);
-      cursor: pointer;
-    }
-  </style>
+        /* 右下：一星期天氣預測 */
+        .forecast-box {
+            justify-content: space-between;
+        }
+        .forecast-title {
+            font-size: 1.1rem;
+            color: #aeaeb2;
+            margin-bottom: 8px;
+        }
+        .forecast-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+            justify-content: center;
+        }
+        .forecast-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 2fr;
+            align-items: center;
+            font-size: 1rem;
+            border-bottom: 1px solid #2c2c2e;
+            padding-bottom: 4px;
+        }
+        .forecast-item:last-child {
+            border-bottom: none;
+        }
+        .temp-range {
+            text-align: right;
+            color: #aeaeb2;
+        }
+        .high-temp {
+            color: #ff453a;
+            font-weight: bold;
+        }
+    </style>
 </head>
-<body class="h-screen w-screen overflow-hidden p-3 md:p-4 select-none">
+<body>
 
-  <div class="h-full w-full grid grid-cols-1 md:grid-cols-2 grid-rows-none md:grid-rows-2 gap-3 md:gap-4">
-    
-    <!-- ==========================================
-         1. TOP-LEFT: CLOCK & DATE (Hours:Minutes, Prominent Day)
-         ========================================== -->
-    <div class="glass-card rounded-3xl p-5 flex flex-col justify-between relative overflow-hidden group">
-      <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-      
-      <!-- Top Bar Controls -->
-      <div class="flex items-center justify-between z-10">
-        <div class="flex items-center space-x-2 text-blue-400">
-          <i class="fa-regular fa-clock text-lg"></i>
-          <span class="text-xs font-semibold tracking-wider uppercase">即時時間與日期</span>
-        </div>
-        <div class="flex items-center space-x-2">
-          <button id="wakeLockBtn" onclick="toggleWakeLock()" class="text-xs bg-slate-800/80 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700 transition flex items-center gap-1.5" title="保持螢幕開啟">
-            <i class="fa-solid fa-lightbulb text-amber-400"></i>
-            <span id="wakeLockStatus">螢幕常亮</span>
-          </button>
-          <button onclick="toggleFullScreen()" class="text-xs bg-slate-800/80 hover:bg-slate-700 text-slate-300 p-1.5 rounded-full border border-slate-700 transition" title="全螢幕">
-            <i class="fa-solid fa-expand"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Main Time & Date Display -->
-      <div class="my-auto z-10 flex flex-col justify-center">
-        <!-- Prominent Day of Week -->
-        <div id="dayOfWeekDisplay" class="text-3xl lg:text-4xl font-black text-amber-400 tracking-wide mb-1 flex items-center gap-2 drop-shadow-sm">
-          星期六
+    <div class="dashboard">
+        <!-- 左上：日期與時間 -->
+        <div class="card time-box">
+            <div id="date">載入中...</div>
+            <div id="time">00:00 AM</div>
         </div>
 
-        <!-- Hours and Minutes (No Seconds) -->
-        <div class="flex items-baseline space-x-3">
-          <h1 id="timeDisplay" class="text-6xl lg:text-7xl font-extrabold tracking-tight text-white font-mono drop-shadow-md">
-            12:00
-          </h1>
-          <span id="ampmDisplay" class="text-2xl lg:text-3xl font-bold text-blue-400 tracking-wider">AM</span>
-        </div>
-        
-        <!-- Date Display (Date, Month) -->
-        <div id="dateDisplay" class="text-lg lg:text-xl font-medium text-slate-300 mt-2 flex items-center gap-2">
-          <i class="fa-regular fa-calendar-days text-blue-400 text-base"></i>
-          <span>載入日期中...</span>
-        </div>
-      </div>
-
-      <!-- Footer Info -->
-      <div class="flex items-center justify-between text-xs text-slate-400 border-t border-slate-700/50 pt-2 z-10">
-        <span id="lunarOrExtraText" class="font-light">iPad Dashboard Mode</span>
-        <span id="timeZoneText" class="font-mono text-slate-500">GMT+8</span>
-      </div>
-    </div>
-
-    <!-- ==========================================
-         2. TOP-RIGHT: CURRENT WEATHER
-         ========================================== -->
-    <div class="glass-card rounded-3xl p-5 flex flex-col justify-between relative overflow-hidden">
-      <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-      <!-- Header & Location -->
-      <div class="flex items-center justify-between z-10">
-        <div class="flex items-center space-x-2 text-sky-400">
-          <i class="fa-solid fa-location-dot"></i>
-          <span id="locationName" class="text-sm font-semibold tracking-wide">香港 (Hong Kong)</span>
-        </div>
-        
-        <div class="flex items-center gap-2">
-          <button onclick="getUserLocation()" class="p-1.5 text-xs bg-slate-800/80 hover:bg-slate-700 text-sky-400 rounded-full border border-slate-700 transition" title="使用GPS定位">
-            <i class="fa-solid fa-crosshairs"></i>
-          </button>
-          <button onclick="toggleCityModal()" class="p-1.5 text-xs bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-full border border-slate-700 transition" title="搜尋城市">
-            <i class="fa-solid fa-magnifying-glass"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Current Weather Display -->
-      <div class="grid grid-cols-2 gap-2 my-auto items-center z-10">
-        <div class="flex flex-col">
-          <div class="flex items-start">
-            <span id="currentTemp" class="text-5xl lg:text-6xl font-bold tracking-tight text-white">--</span>
-            <span class="text-2xl text-sky-400 font-light mt-1">°C</span>
-          </div>
-          <span id="weatherCondition" class="text-base lg:text-lg font-medium text-slate-200 mt-1">載入天氣中...</span>
-          <span id="feelsLike" class="text-xs text-slate-400">體感溫度: --°C</span>
-        </div>
-
-        <div class="flex flex-col items-center justify-center">
-          <div id="weatherIconContainer" class="text-6xl text-sky-400 weather-pulse mb-1">
-            <i class="fa-solid fa-cloud-sun"></i>
-          </div>
-        </div>
-      </div>
-
-      <!-- Extra Weather Metrics -->
-      <div class="grid grid-cols-3 gap-2 border-t border-slate-700/50 pt-2 z-10 text-center">
-        <div class="bg-slate-800/30 rounded-xl p-1.5">
-          <div class="text-[10px] text-slate-400">濕度</div>
-          <div id="humidityVal" class="text-xs font-semibold text-slate-200">--%</div>
-        </div>
-        <div class="bg-slate-800/30 rounded-xl p-1.5">
-          <div class="text-[10px] text-slate-400">風速</div>
-          <div id="windSpeedVal" class="text-xs font-semibold text-slate-200">-- km/h</div>
-        </div>
-        <div class="bg-slate-800/30 rounded-xl p-1.5">
-          <div class="text-[10px] text-slate-400">降雨機率</div>
-          <div id="precipVal" class="text-xs font-semibold text-slate-200">--%</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ==========================================
-         3. BOTTOM-LEFT: APPLE HOME ASSISTANT
-         ========================================== -->
-    <div class="glass-card rounded-3xl p-5 flex flex-col justify-between overflow-hidden relative">
-      <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-      <!-- Header Bar -->
-      <div class="flex items-center justify-between pb-2 border-b border-slate-700/50 z-10">
-        <div class="flex items-center space-x-2 text-amber-400">
-          <i class="fa-solid fa-house-signal text-lg"></i>
-          <span class="text-xs font-semibold tracking-wider uppercase">Apple Home 家庭助理</span>
-        </div>
-        <div class="flex items-center space-x-2">
-          <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full flex items-center gap-1">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> 已連線
-          </span>
-          <button onclick="openAddDeviceModal()" class="text-xs bg-amber-600/80 hover:bg-amber-500 text-white p-1.5 rounded-full transition" title="新增設備">
-            <i class="fa-solid fa-plus"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- Scene Quick Triggers -->
-      <div class="grid grid-cols-4 gap-1.5 my-2 z-10">
-        <button onclick="triggerScene('morning')" class="glass-card-hover bg-slate-800/40 border border-slate-700/60 rounded-xl p-1.5 text-center transition">
-          <i class="fa-solid fa-sun text-amber-400 text-xs mb-0.5"></i>
-          <div class="text-[10px] font-medium text-slate-300">早安模式</div>
-        </button>
-        <button onclick="triggerScene('home')" class="glass-card-hover bg-slate-800/40 border border-slate-700/60 rounded-xl p-1.5 text-center transition">
-          <i class="fa-solid fa-house-user text-sky-400 text-xs mb-0.5"></i>
-          <div class="text-[10px] font-medium text-slate-300">回家模式</div>
-        </button>
-        <button onclick="triggerScene('movie')" class="glass-card-hover bg-slate-800/40 border border-slate-700/60 rounded-xl p-1.5 text-center transition">
-          <i class="fa-solid fa-film text-purple-400 text-xs mb-0.5"></i>
-          <div class="text-[10px] font-medium text-slate-300">影音模式</div>
-        </button>
-        <button onclick="triggerScene('night')" class="glass-card-hover bg-slate-800/40 border border-slate-700/60 rounded-xl p-1.5 text-center transition">
-          <i class="fa-solid fa-moon text-indigo-400 text-xs mb-0.5"></i>
-          <div class="text-[10px] font-medium text-slate-300">晚安模式</div>
-        </button>
-      </div>
-
-      <!-- Smart Accessories Tile Grid -->
-      <div id="deviceGrid" class="flex-1 my-1 overflow-y-auto grid grid-cols-2 gap-2 pr-1 z-10">
-        <!-- Dynamically rendered HomeKit cards -->
-      </div>
-
-      <!-- Home Status Bar -->
-      <div class="flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-700/50 pt-2 z-10">
-        <span id="activeDeviceCount" class="truncate">3 個設備開啟中</span>
-        <span class="text-slate-500 flex items-center gap-1">
-          <i class="fa-solid fa-shield-halved text-emerald-400"></i> 安防監視中
-        </span>
-      </div>
-    </div>
-
-    <!-- ==========================================
-         4. BOTTOM-RIGHT: 7-DAY WEATHER FORECAST
-         ========================================== -->
-    <div class="glass-card rounded-3xl p-5 flex flex-col justify-between overflow-hidden relative">
-      <div class="flex items-center justify-between pb-2 border-b border-slate-700/50">
-        <div class="flex items-center space-x-2 text-sky-400">
-          <i class="fa-solid fa-calendar-week text-lg"></i>
-          <span class="text-xs font-semibold tracking-wider uppercase">未來一星期天氣預測</span>
-        </div>
-        <button onclick="fetchWeatherData()" class="text-slate-400 hover:text-sky-400 text-xs transition flex items-center gap-1">
-          <i class="fa-solid fa-arrows-rotate"></i> 刷新
-        </button>
-      </div>
-
-      <!-- 7-Day Forecast Grid/List -->
-      <div id="forecastContainer" class="flex-1 my-2 overflow-y-auto space-y-1.5 pr-1">
-        <div class="text-center text-slate-400 py-10 text-xs">載入一星期天氣預報中...</div>
-      </div>
-
-      <!-- Forecast Status Footer -->
-      <div class="flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-700/50 pt-2">
-        <span>資料來源: Open-Meteo API</span>
-        <span class="text-slate-500">自動即時更新</span>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- ==========================================
-       MODALS & OVERLAYS
-       ========================================== -->
-
-  <!-- Search City Modal -->
-  <div id="cityModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="glass-card bg-slate-900 border border-slate-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-bold text-white">搜尋城市天氣</h3>
-        <button onclick="toggleCityModal()" class="text-slate-400 hover:text-white p-1">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-      <div class="space-y-3">
-        <input type="text" id="citySearchInput" placeholder="輸入城市名稱 (例如: Taipei, Tokyo, London)" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
-        <button onclick="searchCity()" class="w-full bg-sky-600 hover:bg-sky-500 text-white py-2 rounded-xl text-xs font-semibold transition">
-          搜尋並套用
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add Smart Home Device Modal -->
-  <div id="addDeviceModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="glass-card bg-slate-900 border border-slate-700 rounded-3xl p-6 max-w-md w-full shadow-2xl">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-          <i class="fa-solid fa-plus text-amber-400"></i> 新增 HomeKit 配件
-        </h3>
-        <button onclick="closeAddDeviceModal()" class="text-slate-400 hover:text-white p-1">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <div class="space-y-3">
-        <div>
-          <label class="block text-xs text-slate-300 mb-1">設備名稱</label>
-          <input type="text" id="deviceNameInput" placeholder="例如: 客廳主燈 / 睡房冷氣 / 正門智能鎖" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-        </div>
-        <div>
-          <label class="block text-xs text-slate-300 mb-1">設備類型</label>
-          <select id="deviceTypeInput" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-            <option value="light">智能燈泡 (Light)</option>
-            <option value="climate">冷氣/恆溫器 (Climate)</option>
-            <option value="switch">智能插座 (Plug / Switch)</option>
-            <option value="lock">門鎖 (Smart Lock)</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-xs text-slate-300 mb-1">位置 / 房間</label>
-          <input type="text" id="deviceRoomInput" placeholder="例如: 客廳 / 睡房 / 書房" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-        </div>
-      </div>
-
-      <div class="mt-5 flex justify-end space-x-2">
-        <button onclick="closeAddDeviceModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-xl text-xs transition">取消</button>
-        <button onclick="saveNewDevice()" class="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-xl text-xs font-semibold transition">新增設備</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Camera Live View Modal -->
-  <div id="cameraModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-    <div class="glass-card bg-slate-900 border border-slate-700 rounded-3xl p-5 max-w-lg w-full shadow-2xl relative">
-      <div class="flex justify-between items-center mb-3">
-        <div class="flex items-center gap-2 text-white font-bold text-sm">
-          <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-          <span>正門監視器 Live Feed</span>
-        </div>
-        <button onclick="closeCameraModal()" class="text-slate-400 hover:text-white p-1">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
-
-      <div class="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-slate-800 flex items-center justify-center">
-        <!-- Simulated IP Camera Stream -->
-        <div class="absolute top-3 left-3 text-[10px] font-mono text-emerald-400 bg-black/60 px-2 py-0.5 rounded border border-emerald-500/30">
-          REC • 1080P 30FPS
-        </div>
-        <div class="absolute bottom-3 right-3 text-[10px] font-mono text-slate-400 bg-black/60 px-2 py-0.5 rounded">
-          HKT <span id="cameraTime">14:00</span>
-        </div>
-        <div class="text-center p-4">
-          <i class="fa-solid fa-shield-cat text-4xl text-slate-600 mb-2 animate-bounce"></i>
-          <div class="text-xs text-slate-400">HomeKit Secure Video 即時串流連線中</div>
-          <div class="text-[10px] text-emerald-400 mt-1">未偵測到異常動態</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    /* =========================================================================
-       GLOBAL STATE & INITIALIZATION
-       ========================================================================= */
-    let currentLat = 22.3193; // Default Hong Kong
-    let currentLon = 114.1694;
-    let currentCityName = "香港 (Hong Kong)";
-    let wakeLock = null;
-
-    // Smart Home Accessories State
-    let smartDevices = [
-      {
-        id: 'dev_1',
-        name: '客廳主燈',
-        room: '客廳',
-        type: 'light',
-        state: true,
-        val: 80, // Brightness %
-        icon: 'fa-solid fa-lightbulb'
-      },
-      {
-        id: 'dev_2',
-        name: '睡房冷氣',
-        room: '主臥室',
-        type: 'climate',
-        state: true,
-        val: 23, // Temp °C
-        icon: 'fa-solid fa-snowflake'
-      },
-      {
-        id: 'dev_3',
-        name: '玄關智能門鎖',
-        room: '正門',
-        type: 'lock',
-        state: true, // locked
-        val: 100,
-        icon: 'fa-solid fa-lock'
-      },
-      {
-        id: 'dev_4',
-        name: '正門監視器',
-        room: '戶外',
-        type: 'camera',
-        state: true,
-        val: 100,
-        icon: 'fa-solid fa-video'
-      }
-    ];
-
-    window.onload = function() {
-      // 1. Start Clock (Hour & Minute only)
-      updateClock();
-      setInterval(updateClock, 1000);
-
-      // 2. Initialize Smart Home Assistant
-      initSmartHome();
-
-      // 3. Load Weather Data & 7-Day Forecast
-      getUserLocation();
-
-      // 4. Auto refresh weather every 30 mins
-      setInterval(fetchWeatherData, 30 * 60 * 1000);
-    };
-
-    /* =========================================================================
-       1. TOP-LEFT: CLOCK & DATE LOGIC (Hours & Minutes ONLY, Large Weekday)
-       ========================================================================= */
-    function updateClock() {
-      const now = new Date();
-      
-      let hours = now.getHours();
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      hours = hours % 12;
-      hours = hours ? hours : 12;
-      const formattedHours = String(hours).padStart(2, '0');
-
-      // Display Hours:Minutes ONLY
-      document.getElementById('timeDisplay').innerText = `${formattedHours}:${minutes}`;
-      document.getElementById('ampmDisplay').innerText = ampm;
-
-      // Prominent Day of Week
-      const weekdaysZh = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
-      const weekdayStr = weekdaysZh[now.getDay()];
-      document.getElementById('dayOfWeekDisplay').innerText = weekdayStr;
-
-      // Date Display (Date, Month)
-      const monthNamesEng = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-      const day = now.getDate();
-      const monthEng = monthNamesEng[now.getMonth()];
-      const monthNum = now.getMonth() + 1;
-
-      document.getElementById('dateDisplay').innerHTML = `
-        <span>${day} ${monthEng}</span>
-        <span class="text-xs text-slate-400 font-normal">(${monthNum}月${day}日)</span>
-      `;
-
-      // Sync camera feed time
-      const cameraTimeElem = document.getElementById('cameraTime');
-      if (cameraTimeElem) {
-        cameraTimeElem.innerText = `${formattedHours}:${minutes} ${ampm}`;
-      }
-    }
-
-    async function toggleWakeLock() {
-      try {
-        if ('wakeLock' in navigator) {
-          if (!wakeLock) {
-            wakeLock = await navigator.wakeLock.request('screen');
-            document.getElementById('wakeLockStatus').innerText = "常亮中";
-            document.getElementById('wakeLockBtn').classList.add('border-amber-500/50', 'bg-amber-900/30');
-          } else {
-            await wakeLock.release();
-            wakeLock = null;
-            document.getElementById('wakeLockStatus').innerText = "螢幕常亮";
-            document.getElementById('wakeLockBtn').classList.remove('border-amber-500/50', 'bg-amber-900/30');
-          }
-        } else {
-          alert('你的瀏覽器不完全支援 WakeLock API，請於 iPad 設定中將螢幕鎖定改為「永不」。');
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    function toggleFullScreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(e => console.log(e));
-      } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
-      }
-    }
-
-    /* =========================================================================
-       2. TOP-RIGHT & BOTTOM-RIGHT: WEATHER & 7-DAY FORECAST (Open-Meteo API)
-       ========================================================================= */
-    function getUserLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            currentLat = position.coords.latitude;
-            currentLon = position.coords.longitude;
-            currentCityName = "目前位置 (Current)";
-            fetchWeatherData();
-          },
-          () => {
-            fetchWeatherData();
-          }
-        );
-      } else {
-        fetchWeatherData();
-      }
-    }
-
-    async function fetchWeatherData() {
-      try {
-        document.getElementById('weatherCondition').innerText = "更新天氣中...";
-        
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&current_weather=true&hourly=relativehumidity_2m,precipitation_probability&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto`;
-
-        const response = await fetch(url);
-        const data = await response.json();
-
-        updateCurrentWeatherUI(data);
-        updateForecastUI(data);
-      } catch (err) {
-        console.error("Weather fetch failed:", err);
-        document.getElementById('weatherCondition').innerText = "天氣載入失敗";
-      }
-    }
-
-    function updateCurrentWeatherUI(data) {
-      const current = data.current_weather;
-      const temp = Math.round(current.temperature);
-      const code = current.weathercode;
-      const wind = current.windspeed;
-
-      document.getElementById('locationName').innerText = currentCityName;
-      document.getElementById('currentTemp').innerText = temp;
-      document.getElementById('feelsLike').innerText = `體感溫度: ${temp}°C`;
-      document.getElementById('windSpeedVal').innerText = `${wind} km/h`;
-
-      const humidity = data.hourly?.relativehumidity_2m[0] || 70;
-      document.getElementById('humidityVal').innerText = `${humidity}%`;
-
-      const precip = data.daily?.precipitation_probability_max[0] || 0;
-      document.getElementById('precipVal').innerText = `${precip}%`;
-
-      const weatherMeta = getWeatherMeta(code);
-      document.getElementById('weatherCondition').innerText = weatherMeta.label;
-      document.getElementById('weatherIconContainer').innerHTML = `<i class="${weatherMeta.icon}"></i>`;
-    }
-
-    function updateForecastUI(data) {
-      const container = document.getElementById('forecastContainer');
-      container.innerHTML = '';
-
-      if (!data.daily || !data.daily.time) {
-        container.innerHTML = `<div class="text-center text-slate-500 py-6 text-xs">無法獲取一星期預報</div>`;
-        return;
-      }
-
-      const days = data.daily.time;
-      const maxTemps = data.daily.temperature_2m_max;
-      const minTemps = data.daily.temperature_2m_min;
-      const codes = data.daily.weathercode;
-      const precipProbs = data.daily.precipitation_probability_max;
-
-      const weekdaysZh = ["日", "一", "二", "三", "四", "五", "六"];
-
-      days.forEach((dateStr, idx) => {
-        const dateObj = new Date(dateStr);
-        const dayNum = dateObj.getDate();
-        const monthNum = dateObj.getMonth() + 1;
-        const weekday = weekdaysZh[dateObj.getDay()];
-        const isToday = idx === 0;
-
-        const maxT = Math.round(maxTemps[idx]);
-        const minT = Math.round(minTemps[idx]);
-        const meta = getWeatherMeta(codes[idx]);
-        const precip = precipProbs ? precipProbs[idx] : 0;
-
-        const row = document.createElement('div');
-        row.className = `p-2 rounded-2xl ${isToday ? 'bg-sky-500/15 border border-sky-500/30' : 'bg-slate-800/30 border border-slate-700/40'} flex items-center justify-between text-xs glass-card-hover`;
-
-        row.innerHTML = `
-          <div class="flex items-center space-x-2.5 min-w-[90px]">
-            <span class="font-bold ${isToday ? 'text-sky-300' : 'text-slate-200'}">週${weekday}</span>
-            <span class="text-[10px] text-slate-400">${monthNum}/${dayNum}</span>
-          </div>
-
-          <div class="flex items-center space-x-2 flex-1 justify-center">
-            <i class="${meta.icon} text-base"></i>
-            <span class="text-[11px] text-slate-300 hidden sm:inline">${meta.shortLabel}</span>
-          </div>
-
-          <div class="flex items-center space-x-3 justify-end">
-            <span class="text-[10px] text-sky-400/80"><i class="fa-solid fa-droplet text-[9px]"></i> ${precip}%</span>
-            <div class="font-mono text-right min-w-[60px]">
-              <span class="font-bold text-white">${maxT}°</span>
-              <span class="text-slate-400 text-[10px]"> / ${minT}°</span>
+        <!-- 右上：當天天氣 -->
+        <div class="card current-weather">
+            <div class="weather-main">
+                <div id="current-temp">--°</div>
+                <div id="weather-info">
+                    <div style="font-weight: bold; color: #ff9500;">即時天氣</div>
+                    <div id="weather-text">正在定位...</div>
+                </div>
             </div>
-          </div>
-        `;
+        </div>
 
-        container.appendChild(row);
-      });
-    }
+        <!-- 左下：Home Assistant & Ecovacs App 連結 -->
+        <div class="card apps-box">
+            <div class="apps-title">快捷面板控制</div>
+            <div class="app-grid">
+                <!-- iOS URL Schemes 捷徑觸發跳轉 -->
+                <a href="homeassistant://" class="app-btn">
+                    <span class="app-icon">🏠</span>
+                    <span>Home Assistant</span>
+                </a>
+                <a href="ecovacs://" class="app-btn">
+                    <span class="app-icon">🤖</span>
+                    <span>Ecovacs Home</span>
+                </a>
+            </div>
+        </div>
 
-    function toggleCityModal() {
-      document.getElementById('cityModal').classList.toggle('hidden');
-    }
+        <!-- 右下：一星期預測 -->
+        <div class="card forecast-box">
+            <div class="forecast-title">本週天氣預測</div>
+            <div class="forecast-list" id="forecast-container">
+                <div class="forecast-item">載入中...</div>
+            </div>
+        </div>
+    </div>
 
-    async function searchCity() {
-      const city = document.getElementById('citySearchInput').value.trim();
-      if (!city) return;
-
-      try {
-        const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=zh&format=json`;
-        const res = await fetch(geoUrl);
-        const data = await res.json();
-
-        if (data.results && data.results.length > 0) {
-          const loc = data.results[0];
-          currentLat = loc.latitude;
-          currentLon = loc.longitude;
-          currentCityName = `${loc.name} (${loc.country || ''})`;
-          fetchWeatherData();
-          toggleCityModal();
-        } else {
-          alert('找不到該城市，請重新嘗試');
+    <script>
+        // 1. 時間與日期邏輯 (格式：日期, 月份 / 12小時制)
+        function updateClock() {
+            const now = new Date();
+            
+            // 日期格式化 (例如: 19, 九月)
+            const options = { day: 'numeric', month: 'long' };
+            document.getElementById('date').innerText = now.toLocaleDateString('zh-TW', options);
+            
+            // 12 小時制時間格式化
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // 0 點應顯示為 12
+            
+            document.getElementById('time').innerText = `${hours}:${minutes} ${amppm}`;
         }
-      } catch (e) {
-        console.error(e);
-        alert('搜尋發生錯誤');
-      }
-    }
+        setInterval(updateClock, 1000);
+        updateClock();
 
-    function getWeatherMeta(code) {
-      if (code === 0) return { label: '晴朗無雲', shortLabel: '晴朗', icon: 'fa-solid fa-sun text-amber-400' };
-      if (code === 1 || code === 2) return { label: '大致晴朗', shortLabel: '多雲', icon: 'fa-solid fa-cloud-sun text-sky-300' };
-      if (code === 3) return { label: '密雲 / 陰天', shortLabel: '陰天', icon: 'fa-solid fa-cloud text-slate-400' };
-      if (code >= 45 && code <= 48) return { label: '有霧', shortLabel: '有霧', icon: 'fa-solid fa-smog text-slate-400' };
-      if (code >= 51 && code <= 55) return { label: '毛毛細雨', shortLabel: '細雨', icon: 'fa-solid fa-cloud-rain text-sky-400' };
-      if (code >= 61 && code <= 65) return { label: '下雨 / 陣雨', shortLabel: '有雨', icon: 'fa-solid fa-cloud-showers-heavy text-blue-400' };
-      if (code >= 80 && code <= 82) return { label: '強烈陣雨', shortLabel: '陣雨', icon: 'fa-solid fa-cloud-showers-water text-blue-500' };
-      if (code >= 95) return { label: '雷暴', shortLabel: '雷暴', icon: 'fa-solid fa-bolt text-amber-300' };
-      return { label: '多雲', shortLabel: '多雲', icon: 'fa-solid fa-cloud-sun text-sky-300' };
-    }
+        // 天氣代碼對應表
+        const weatherCodes = {
+            0: "晴朗", 1: "晴時多雲", 2: "陰時多雲", 3: "陰天",
+            45: "霧", 48: "霾霧", 51: "毛毛雨", 61: "小雨",
+            63: "中雨", 65: "大雨", 71: "小雪", 73: "中雪",
+            75: "大雪", 80: "陣雨", 81: "大陣雨", 95: "雷陣雨"
+        };
 
-    /* =========================================================================
-       3. BOTTOM-LEFT: APPLE HOME ASSISTANT / SMART HOME CONTROLS
-       ========================================================================= */
-    function initSmartHome() {
-      const storedDevices = localStorage.getItem('ipad_dashboard_smart_devices');
-      if (storedDevices) {
-        smartDevices = JSON.parse(storedDevices);
-      }
-      renderSmartDevices();
-    }
+        // 2. 自動定位並獲取 API 天氣數據
+        function getWeatherData() {
+            // 預設為香港經緯度，若使用者允許定位則自動更新
+            let lat = 22.28;
+            let lon = 114.16;
 
-    function renderSmartDevices() {
-      const grid = document.getElementById('deviceGrid');
-      grid.innerHTML = '';
-
-      let activeCount = 0;
-
-      smartDevices.forEach(dev => {
-        if (dev.state) activeCount++;
-
-        const card = document.createElement('div');
-        
-        let activeBg = dev.state 
-          ? 'bg-amber-500/20 border-amber-500/40 text-amber-200' 
-          : 'bg-slate-800/40 border-slate-700/50 text-slate-400';
-
-        if (dev.type === 'climate' && dev.state) {
-          activeBg = 'bg-sky-500/20 border-sky-500/40 text-sky-200';
-        } else if (dev.type === 'camera') {
-          activeBg = 'bg-slate-800/60 border-slate-700/60 text-slate-200';
-        } else if (dev.type === 'lock' && dev.state) {
-          activeBg = 'bg-emerald-500/20 border-emerald-500/40 text-emerald-200';
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    lat = position.coords.latitude;
+                    lon = position.coords.longitude;
+                    fetchApi(lat, lon);
+                }, () => {
+                    fetchApi(lat, lon); // 定位失敗用預設經緯度
+                });
+            } else {
+                fetchApi(lat, lon);
+            }
         }
 
-        card.className = `p-3 rounded-2xl border ${activeBg} flex flex-col justify-between transition-all duration-300 relative group`;
+        function fetchApi(lat, lon) {
+            const url = `https://open-meteo.com{lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`;
+            
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    // 渲染即時天氣
+                    const current = data.current_weather;
+                    document.getElementById('current-temp').innerText = `${Math.round(current.temperature)}°`;
+                    document.getElementById('weather-text').innerText = weatherCodes[current.weathercode] || "多雲";
 
-        let controlArea = '';
+                    // 渲染一週預測
+                    const forecastContainer = document.getElementById('forecast-container');
+                    forecastContainer.innerHTML = ''; // 清空
+                    
+                    const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
+                    
+                    // 顯示接下來的 5-6 天 (依 iPad Mini 高度適配)
+                    for(let i = 1; i < 6; i++) {
+                        const dateStr = data.daily.time[i];
+                        const dateObj = new Date(dateStr);
+                        const dayName = days[dateObj.getDay()];
+                        const code = data.daily.weathercode[i];
+                        const wText = weatherCodes[code] || "多雲";
+                        const maxTemp = Math.round(data.daily.temperature_2m_max[i]);
+                        const minTemp = Math.round(data.daily.temperature_2m_min[i]);
 
-        if (dev.type === 'light') {
-          controlArea = `
-            <div class="mt-2">
-              <div class="flex justify-between text-[10px] mb-1">
-                <span>亮度</span>
-                <span>${dev.state ? dev.val + '%' : '關閉'}</span>
-              </div>
-              <input type="range" min="0" max="100" value="${dev.val}" 
-                onchange="updateDeviceVal('${dev.id}', this.value)"
-                class="w-full accent-amber-400 h-1">
-            </div>
-          `;
-        } else if (dev.type === 'climate') {
-          controlArea = `
-            <div class="mt-2 flex items-center justify-between">
-              <button onclick="adjustTemp('${dev.id}', -1)" class="w-6 h-6 rounded-full bg-slate-800 hover:bg-slate-700 text-xs font-bold flex items-center justify-center border border-slate-700">-</button>
-              <span class="text-xs font-bold font-mono text-white">${dev.val}°C</span>
-              <button onclick="adjustTemp('${dev.id}', 1)" class="w-6 h-6 rounded-full bg-slate-800 hover:bg-slate-700 text-xs font-bold flex items-center justify-center border border-slate-700">+</button>
-            </div>
-          `;
-        } else if (dev.type === 'camera') {
-          controlArea = `
-            <button onclick="openCameraModal()" class="mt-2 w-full py-1 bg-slate-900/80 hover:bg-slate-800 text-[10px] text-sky-400 font-medium rounded-xl border border-sky-500/30 flex items-center justify-center gap-1 transition">
-              <i class="fa-solid fa-play text-[9px]"></i> 查看實時畫面
-            </button>
-          `;
-        } else if (dev.type === 'lock') {
-          controlArea = `
-            <div class="mt-2 text-[10px] flex justify-between items-center font-medium">
-              <span>狀態:</span>
-              <span class="${dev.state ? 'text-emerald-400' : 'text-amber-400'}">${dev.state ? '已上鎖 (Locked)' : '已解鎖 (Unlocked)'}</span>
-            </div>
-          `;
-        } else {
-          controlArea = `
-            <div class="mt-2 text-[10px] text-slate-400">
-              ${dev.state ? '運作中' : '已關閉'}
-            </div>
-          `;
+                        const item = document.createElement('div');
+                        item.className = 'forecast-item';
+                        item.innerHTML = `
+                            <div>${dayName}</div>
+                            <div style="color: #ff9500; font-size:0.9rem;">${wText}</div>
+                            <div class="temp-range"><span class="high-temp">${maxTemp}°</span> / ${minTemp}°</div>
+                        `;
+                        forecastContainer.appendChild(item);
+                    }
+                })
+                .catch(() => {
+                    document.getElementById('weather-text').innerText = "連線失敗";
+                });
         }
 
-        card.innerHTML = `
-          <div class="flex items-start justify-between">
-            <div onclick="toggleDevice('${dev.id}')" class="cursor-pointer flex items-center gap-2">
-              <div class="w-8 h-8 rounded-xl ${dev.state ? 'bg-amber-400 text-slate-950' : 'bg-slate-800 text-slate-400'} flex items-center justify-center text-sm font-bold transition">
-                <i class="${dev.icon}"></i>
-              </div>
-              <div>
-                <div class="text-xs font-bold text-white truncate max-w-[85px]">${escapeHtml(dev.name)}</div>
-                <div class="text-[10px] text-slate-400 truncate">${escapeHtml(dev.room)}</div>
-              </div>
-            </div>
-
-            <div class="flex items-center gap-1">
-              <button onclick="toggleDevice('${dev.id}')" class="w-8 h-4 rounded-full ${dev.state ? 'bg-amber-400' : 'bg-slate-700'} relative transition p-0.5">
-                <div class="w-3 h-3 rounded-full bg-white transition transform ${dev.state ? 'translate-x-4' : 'translate-x-0'}"></div>
-              </button>
-              <button onclick="deleteDevice('${dev.id}')" class="text-slate-500 hover:text-red-400 p-1 text-[10px] opacity-0 group-hover:opacity-100 transition">
-                <i class="fa-solid fa-xmark"></i>
-              </button>
-            </div>
-          </div>
-
-          ${controlArea}
-        `;
-
-        grid.appendChild(card);
-      });
-
-      document.getElementById('activeDeviceCount').innerText = `${activeCount} 個設備運作中`;
-    }
-
-    function toggleDevice(id) {
-      const dev = smartDevices.find(d => d.id === id);
-      if (dev) {
-        dev.state = !dev.state;
-        saveSmartDevices();
-        renderSmartDevices();
-      }
-    }
-
-    function updateDeviceVal(id, newVal) {
-      const dev = smartDevices.find(d => d.id === id);
-      if (dev) {
-        dev.val = parseInt(newVal);
-        if (dev.val > 0) dev.state = true;
-        saveSmartDevices();
-        renderSmartDevices();
-      }
-    }
-
-    function adjustTemp(id, delta) {
-      const dev = smartDevices.find(d => d.id === id);
-      if (dev) {
-        dev.val = Math.max(16, Math.min(30, dev.val + delta));
-        saveSmartDevices();
-        renderSmartDevices();
-      }
-    }
-
-    function triggerScene(sceneType) {
-      if (sceneType === 'morning') {
-        smartDevices.forEach(d => {
-          if (d.type === 'light') { d.state = true; d.val = 100; }
-          if (d.type === 'climate') { d.state = true; d.val = 24; }
-        });
-      } else if (sceneType === 'movie') {
-        smartDevices.forEach(d => {
-          if (d.type === 'light') { d.state = true; d.val = 20; }
-        });
-      } else if (sceneType === 'night') {
-        smartDevices.forEach(d => {
-          if (d.type === 'light') { d.state = false; d.val = 0; }
-          if (d.type === 'lock') { d.state = true; }
-        });
-      } else if (sceneType === 'home') {
-        smartDevices.forEach(d => {
-          d.state = true;
-          if (d.type === 'light') d.val = 80;
-        });
-      }
-      saveSmartDevices();
-      renderSmartDevices();
-    }
-
-    function openAddDeviceModal() {
-      document.getElementById('addDeviceModal').classList.remove('hidden');
-    }
-
-    function closeAddDeviceModal() {
-      document.getElementById('addDeviceModal').classList.add('hidden');
-    }
-
-    function saveNewDevice() {
-      const name = document.getElementById('deviceNameInput').value.trim();
-      const type = document.getElementById('deviceTypeInput').value;
-      const room = document.getElementById('deviceRoomInput').value.trim() || '客廳';
-
-      if (!name) {
-        alert('請輸入設備名稱');
-        return;
-      }
-
-      let icon = 'fa-solid fa-power-off';
-      if (type === 'light') icon = 'fa-solid fa-lightbulb';
-      if (type === 'climate') icon = 'fa-solid fa-snowflake';
-      if (type === 'lock') icon = 'fa-solid fa-lock';
-      if (type === 'switch') icon = 'fa-solid fa-plug';
-
-      const newDev = {
-        id: 'dev_' + Date.now(),
-        name: name,
-        room: room,
-        type: type,
-        state: true,
-        val: type === 'climate' ? 22 : 80,
-        icon: icon
-      };
-
-      smartDevices.push(newDev);
-      saveSmartDevices();
-      renderSmartDevices();
-      closeAddDeviceModal();
-
-      document.getElementById('deviceNameInput').value = '';
-    }
-
-    function deleteDevice(id) {
-      smartDevices = smartDevices.filter(d => d.id !== id);
-      saveSmartDevices();
-      renderSmartDevices();
-    }
-
-    function saveSmartDevices() {
-      localStorage.setItem('ipad_dashboard_smart_devices', JSON.stringify(smartDevices));
-    }
-
-    function openCameraModal() {
-      document.getElementById('cameraModal').classList.remove('hidden');
-    }
-
-    function closeCameraModal() {
-      document.getElementById('cameraModal').classList.add('hidden');
-    }
-
-    function escapeHtml(str) {
-      return str.replace(/[&<>"']/g, function(m) {
-        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
-      });
-    }
-  </script>
+        // 初始化載入天氣並設定每 30 分鐘自動重整天氣
+        getWeatherData();
+        setInterval(getWeatherData, 1800000);
+    </script>
 </body>
 </html>
