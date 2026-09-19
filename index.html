@@ -1,289 +1,679 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="智慧家居控制">
-    <title>Modern iPad Home Dashboard</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>iPad Mini / Air Dashboard</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Fonts: Outfits & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --ipad-aspect: 4 / 3;
+    }
+
+    * {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #030712;
+      color: #f3f4f6;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* Ambient Background Glow Particles */
+    .bg-glow-1 {
+      position: absolute;
+      top: -10%;
+      left: -10%;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(0,0,0,0) 70%);
+      filter: blur(60px);
+      animation: floatGlow 14s infinite alternate ease-in-out;
+      pointer-events: none;
+    }
+
+    .bg-glow-2 {
+      position: absolute;
+      bottom: -10%;
+      right: -10%;
+      width: 55vw;
+      height: 55vw;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, rgba(0,0,0,0) 70%);
+      filter: blur(60px);
+      animation: floatGlow 18s infinite alternate-reverse ease-in-out;
+      pointer-events: none;
+    }
+
+    .bg-glow-3 {
+      position: absolute;
+      top: 40%;
+      left: 30%;
+      width: 40vw;
+      height: 40vw;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.08) 0%, rgba(0,0,0,0) 70%);
+      filter: blur(80px);
+      animation: pulseGlow 10s infinite alternate ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes floatGlow {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(60px, 40px) scale(1.15); }
+    }
+
+    @keyframes pulseGlow {
+      0% { opacity: 0.4; transform: scale(0.9); }
+      100% { opacity: 0.8; transform: scale(1.1); }
+    }
+
+    /* Modern Glassmorphism Card Style */
+    .glass-panel {
+      background: rgba(17, 24, 39, 0.55);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .glass-tile {
+      background: rgba(31, 41, 55, 0.45);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-tile:active {
+      transform: scale(0.96);
+      background: rgba(55, 65, 81, 0.6);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Glowing Text & Elements */
+    .neon-text-blue {
+      text-shadow: 0 0 20px rgba(56, 189, 248, 0.5), 0 0 40px rgba(56, 189, 248, 0.2);
+    }
     
-    <style>
-        /* 現代 iOS 頂級暗黑控制台風格 */
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #08080a;
-            color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden;
-            box-sizing: border-box;
-        }
+    .neon-text-amber {
+      text-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+    }
 
-        /* 2x2 網格佈局：完全填滿 iPad 螢幕 */
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1.2fr 0.8fr; /* 時鐘大格，App 細格 */
-            gap: 25px;
-            width: 100%;
-            height: 100%;
-            padding: 40px 25px 25px 25px; /* 頂部留空給 iOS 狀態列 */
-            box-sizing: border-box;
-        }
+    .font-mono-clock {
+      font-family: 'JetBrains Mono', monospace;
+    }
 
-        /* 精緻卡片設計（毛玻璃微光質感） */
-        .card {
-            background-color: #16161a;
-            border-radius: 20px;
-            border: 1px solid #282830;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-        }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+    }
 
-        /* 左上：炫彩霓虹大時鐘 */
-        .time-box {
-            align-items: center;
-            background: linear-gradient(145deg, #111115, #1a1a22);
-        }
-        #date {
-            font-size: 2.2rem;
-            color: #a1a1aa;
-            font-weight: 300;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-        }
-        .clock-display {
-            display: flex;
-            align-items: baseline;
-        }
-        #time {
-            font-size: 6rem; /* 現代螢幕特大字體 */
-            font-weight: 700;
-            color: #30d158; /* 蘋果綠 */
-            letter-spacing: -2px;
-            /* 進階多層發光效果 */
-            text-shadow: 0 0 15px rgba(48, 209, 88, 0.5), 0 0 30px rgba(48, 209, 88, 0.2);
-        }
-        #ampm {
-            font-size: 1.8rem;
-            color: #52525b;
-            margin-left: 10px;
-            font-weight: 600;
-        }
+    /* Animated Robot Vacuum Cleaner Wheel */
+    .spin-slow {
+      animation: spin 6s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
 
-        /* 左下：細格智慧家居 APP（緊湊排版） */
-        .apps-box {
-            justify-content: space-between;
-        }
-        .section-title {
-            font-size: 1.2rem;
-            color: #a1a1aa;
-            font-weight: bold;
-            margin-bottom: 12px;
-        }
-        .app-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            flex-grow: 1;
-        }
-        .app-btn {
-            background: linear-gradient(135deg, #22222a, #2a2a35);
-            border: 1px solid #3f3f46;
-            border-radius: 16px;
-            text-decoration: none;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-        }
-        .app-btn:active {
-            transform: scale(0.96);
-            background: #3f3f46;
-        }
-        .app-icon { font-size: 2.2rem; }
-        .app-text { font-size: 1rem; font-weight: bold; }
-
-        /* 右上與右下：兩格均分的天氣區塊 */
-        .weather-main {
-            display: flex;
-            align-items: center;
-            justify-content: space-around;
-        }
-        #hk-temp {
-            font-size: 5rem;
-            font-weight: 700;
-            color: #ffffff;
-        }
-        .weather-info {
-            display: flex;
-            flex-direction: column;
-        }
-        #hk-weather-text {
-            font-size: 1.6rem;
-            color: #ff9500; /* 亮橘色 */
-            font-weight: bold;
-            margin-bottom: 6px;
-        }
-        #hk-humidity {
-            font-size: 1.1rem;
-            color: #a1a1aa;
-        }
-        #hk-warning {
-            font-size: 1rem;
-            color: #ff453a;
-            font-weight: bold;
-            margin-top: 10px;
-            text-align: center;
-        }
-
-        /* 天氣預報列表排版 */
-        .forecast-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 5px;
-        }
-        .forecast-item {
-            display: grid;
-            grid-template-columns: 1fr 1.5fr 1fr;
-            align-items: center;
-            font-size: 1.1rem;
-            border-bottom: 1px solid #282830;
-            padding-bottom: 8px;
-        }
-        .forecast-item:last-child { border-bottom: none; }
-        .fc-day { font-weight: bold; color: #ffffff; }
-        .fc-text { color: #ff9500; font-size: 1.05rem; }
-        .fc-temp { text-align: right; color: #a1a1aa; }
-        .fc-high { color: #ff453a; font-weight: bold; }
-    </style>
+    /* Weather Pulse Glow Effect */
+    .weather-float {
+      animation: floatWeather 4s ease-in-out infinite;
+    }
+    @keyframes floatWeather {
+      0%, 100% { transform: translateY(0px) scale(1); filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.4)); }
+      50% { transform: translateY(-8px) scale(1.04); filter: drop-shadow(0 0 25px rgba(56, 189, 248, 0.7)); }
+    }
+  </style>
 </head>
-<body>
+<body class="p-3 md:p-5 flex items-center justify-center relative overflow-hidden select-none">
 
-    <div class="dashboard">
-        <!-- 左上：大時鐘（英式日期 + 霓虹綠效果） -->
-        <div class="card time-box">
-            <div id="date">19 Sept</div>
-            <div class="clock-display">
-                <span id="time">00:00</span>
-                <span id="ampm">AM</span>
-            </div>
+  <div class="bg-glow-1"></div>
+  <div class="bg-glow-2"></div>
+  <div class="bg-glow-3"></div>
+
+  <main class="w-full h-full max-w-[1400px] max-h-[1050px] aspect-[4/3] grid grid-cols-2 grid-rows-2 gap-3.5 md:gap-5 z-10 relative">
+
+    <!-- ==========================================
+         1. TOP-LEFT: LARGE CLOCK & BRITISH DATE
+         ========================================== -->
+    <section class="glass-panel rounded-3xl p-6 md:p-8 flex flex-col justify-between relative overflow-hidden group">
+      <div class="absolute -right-12 -top-12 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Top Utility Header Bar -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2 text-cyan-400 font-semibold text-xs md:text-sm tracking-wider uppercase">
+          <i class="fa-regular fa-clock text-base"></i>
+          <span>Live Clock</span>
         </div>
-
-        <!-- 右上：香港天文台即時天氣 -->
-        <div class="card">
-            <div class="section-title" style="margin-bottom: 5px;">香港地區即時天氣</div>
-            <div class="weather-main">
-                <div id="hk-temp">--°</div>
-                <div class="weather-info">
-                    <div id="hk-weather-text">正在連線...</div>
-                    <div id="hk-humidity">相對濕度: --%</div>
-                </div>
-            </div>
-            <div id="hk-warning"></div>
-        </div>
-
-        <!-- 左下：細格智慧家居 APP（支援現代 iOS 跳轉） -->
-        <div class="card apps-box">
-            <div class="section-title">快捷面板控制</div>
-            <div class="app-grid">
-                <a href="homeassistant://" class="app-btn">
-                    <span class="app-icon">🏠</span>
-                    <span class="app-text">Home Assistant</span>
-                </a>
-                <a href="ecovacs://" class="app-btn">
-                    <span class="app-icon">🤖</span>
-                    <span class="app-text">Ecovacs Home</span>
-                </a>
-            </div>
-        </div>
-
-        <!-- 右下：香港天文台一星期預測 -->
-        <div class="card">
-            <div class="section-title">香港九天天氣預報</div>
-            <div class="forecast-list" id="hk-forecast-box">
-                <div style="color:#a1a1aa; font-size:1.1rem;">正在讀取天文台數據...</div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // 1. 現代系統專用時鐘邏輯（英式日期 19 Sept）
-        const shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         
-        function updateClock() {
-            const now = new Date();
-            
-            // 設定英式日期格式: 19 Sept
-            document.getElementById('date').innerText = now.getDate() + " " + shortMonths[now.getMonth()];
-            
-            let hours = now.getHours();
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            
-            hours = hours % 12;
-            hours = hours ? hours : 12; 
-            
-            document.getElementById('time').innerText = `${hours}:${minutes}`;
-            document.getElementById('ampm').innerText = ampm;
+        <div class="flex items-center space-x-2">
+          <!-- Screen Wake Lock Toggle -->
+          <button id="wakeLockBtn" onclick="toggleWakeLock()" class="glass-tile px-3 py-1.5 rounded-full text-xs text-slate-300 flex items-center space-x-1.5 transition" title="Keep Screen Awake">
+            <i class="fa-solid fa-lightbulb text-amber-400 text-xs"></i>
+            <span id="wakeLockText" class="font-medium">Stay Awake</span>
+          </button>
+          
+          <!-- Fullscreen Toggle -->
+          <button onclick="toggleFullScreen()" class="glass-tile p-2 rounded-full text-xs text-slate-300 transition" title="Full Screen">
+            <i class="fa-solid fa-expand"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Center Time & Date Content -->
+      <div class="my-auto py-2">
+        <!-- Prominent Weekday -->
+        <div id="dayOfWeek" class="text-3xl sm:text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-amber-500 tracking-wide uppercase mb-1">
+          SATURDAY
+        </div>
+
+        <!-- Large 12-Hour Clock (Hours : Minutes) -->
+        <div class="flex items-baseline space-x-3">
+          <h1 id="clockDisplay" class="text-6xl sm:text-7xl md:text-8xl font-extrabold font-mono-clock tracking-tight text-white neon-text-blue">
+            04:05
+          </h1>
+          <span id="ampmDisplay" class="text-2xl sm:text-3xl font-extrabold text-cyan-400 tracking-widest font-mono-clock">
+            PM
+          </span>
+        </div>
+
+        <!-- British Format Date Display: "19 SEPT" -->
+        <div class="mt-3 flex items-center space-x-3 text-2xl sm:text-3xl font-extrabold text-slate-200 tracking-wider">
+          <i class="fa-solid fa-calendar-day text-cyan-400 text-xl sm:text-2xl"></i>
+          <span id="britishDateDisplay" class="text-amber-300 font-mono-clock">19 SEPT</span>
+          <span id="fullDateSub" class="text-xs sm:text-sm font-normal text-slate-400">/ 2026</span>
+        </div>
+      </div>
+
+      <!-- Bottom Info Bar -->
+      <div class="flex items-center justify-between text-xs text-slate-400 border-t border-slate-800/80 pt-3">
+        <span class="flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>iPad Dashboard Online</span>
+        </span>
+        <span id="timezoneLabel" class="font-mono text-slate-500">HKT (UTC+8)</span>
+      </div>
+    </section>
+
+
+    <!-- ==========================================
+         2. TOP-RIGHT: REAL-TIME WEATHER
+         ========================================== -->
+    <section class="glass-panel rounded-3xl p-6 md:p-8 flex flex-col justify-between relative overflow-hidden">
+      <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Weather Header -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-2 text-sky-400 font-semibold text-xs md:text-sm tracking-wider uppercase">
+          <i class="fa-solid fa-location-dot"></i>
+          <span id="locationName" class="text-slate-200">Hong Kong</span>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button onclick="getUserLocation()" class="glass-tile p-2 rounded-full text-xs text-sky-400 transition" title="Auto GPS">
+            <i class="fa-solid fa-crosshairs"></i>
+          </button>
+          <button onclick="toggleCityModal()" class="glass-tile p-2 rounded-full text-xs text-slate-300 transition" title="Search City">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Weather Main Display -->
+      <div class="grid grid-cols-2 gap-4 my-auto items-center">
+        <!-- Left Temp & Condition -->
+        <div class="flex flex-col">
+          <div class="flex items-start">
+            <span id="currentTemp" class="text-6xl sm:text-7xl font-extrabold text-white tracking-tight">--</span>
+            <span class="text-3xl text-sky-400 font-light mt-1">°C</span>
+          </div>
+          <div id="weatherCondition" class="text-lg sm:text-xl font-semibold text-slate-200 mt-1">
+            Loading Weather...
+          </div>
+          <div id="feelsLikeTemp" class="text-xs text-slate-400 mt-0.5">
+            Feels like: --°C
+          </div>
+        </div>
+
+        <!-- Right Dynamic Weather Animated Icon -->
+        <div class="flex flex-col items-center justify-center">
+          <div id="weatherIconContainer" class="text-7xl sm:text-8xl text-sky-400 weather-float">
+            <i class="fa-solid fa-cloud-sun"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Extra Weather Metrics Row -->
+      <div class="grid grid-cols-4 gap-2 border-t border-slate-800/80 pt-3 text-center">
+        <div class="glass-tile rounded-2xl p-2">
+          <div class="text-[10px] uppercase text-slate-400 font-medium">Humidity</div>
+          <div id="humidityVal" class="text-xs sm:text-sm font-bold text-slate-100 mt-0.5">--%</div>
+        </div>
+        <div class="glass-tile rounded-2xl p-2">
+          <div class="text-[10px] uppercase text-slate-400 font-medium">Rain Chance</div>
+          <div id="precipVal" class="text-xs sm:text-sm font-bold text-sky-300 mt-0.5">--%</div>
+        </div>
+        <div class="glass-tile rounded-2xl p-2">
+          <div class="text-[10px] uppercase text-slate-400 font-medium">Wind</div>
+          <div id="windSpeedVal" class="text-xs sm:text-sm font-bold text-slate-100 mt-0.5">-- km/h</div>
+        </div>
+        <div class="glass-tile rounded-2xl p-2">
+          <div class="text-[10px] uppercase text-slate-400 font-medium">UV Index</div>
+          <div id="uvIndexVal" class="text-xs sm:text-sm font-bold text-amber-300 mt-0.5">--</div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ==========================================
+         3. BOTTOM-LEFT: APP SHORTCUTS (2 SUB-TILES)
+         ========================================== -->
+    <section class="glass-panel rounded-3xl p-5 md:p-6 flex flex-col justify-between relative overflow-hidden">
+      
+      <!-- Section Title -->
+      <div class="flex items-center justify-between pb-2 border-b border-slate-800/80">
+        <div class="flex items-center space-x-2 text-amber-400 font-semibold text-xs md:text-sm tracking-wider uppercase">
+          <i class="fa-solid fa-grip"></i>
+          <span>iPad App Shortcuts</span>
+        </div>
+        <span class="text-[10px] bg-amber-500/10 text-amber-300 border border-amber-500/20 px-2 py-0.5 rounded-full font-medium">
+          Tap to Launch App
+        </span>
+      </div>
+
+      <!-- 2 Sub-Tiles Layout (Side-by-Side Grid) -->
+      <div class="grid grid-cols-2 gap-3.5 my-auto">
+
+        <!-- SUB-TILE 1: HOME ASSISTANT -->
+        <a href="homeassistant://" id="haShortcutBtn" onclick="handleAppLaunch(event, 'homeassistant://', 'http://homeassistant.local:8123')" class="glass-tile rounded-2xl p-4 flex flex-col justify-between group relative overflow-hidden border border-slate-700/60 hover:border-blue-500/50">
+          <div class="absolute -right-6 -top-6 w-20 h-20 bg-blue-500/10 rounded-full blur-xl pointer-events-none"></div>
+          
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-400 text-white flex items-center justify-center text-2xl shadow-lg shadow-blue-500/30 group-active:scale-95 transition">
+              <i class="fa-solid fa-house-signal"></i>
+            </div>
+            <span class="flex h-3 w-3 relative">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
+            </span>
+          </div>
+
+          <div>
+            <div class="text-sm sm:text-base font-bold text-white group-hover:text-cyan-300 transition flex items-center justify-between">
+              <span>Home Assistant</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-60"></i>
+            </div>
+            <div class="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
+              <i class="fa-solid fa-shield-halved text-blue-400 text-[10px]"></i>
+              <span>Smart Home Control</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- SUB-TILE 2: ECOVACS HOME -->
+        <a href="ecovacs://" id="ecovacsShortcutBtn" onclick="handleAppLaunch(event, 'ecovacs://', 'https://www.ecovacs.com')" class="glass-tile rounded-2xl p-4 flex flex-col justify-between group relative overflow-hidden border border-slate-700/60 hover:border-teal-500/50">
+          <div class="absolute -right-6 -top-6 w-20 h-20 bg-teal-500/10 rounded-full blur-xl pointer-events-none"></div>
+
+          <div class="flex items-center justify-between mb-3">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-teal-600 to-emerald-400 text-white flex items-center justify-center text-2xl shadow-lg shadow-teal-500/30 group-active:scale-95 transition">
+              <i class="fa-solid fa-robot spin-slow"></i>
+            </div>
+            <div class="flex items-center space-x-1 text-emerald-400 text-[10px] bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30 font-mono">
+              <i class="fa-solid fa-bolt text-[9px]"></i>
+              <span>100%</span>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-sm sm:text-base font-bold text-white group-hover:text-emerald-300 transition flex items-center justify-between">
+              <span>Ecovacs Home</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-60"></i>
+            </div>
+            <div class="text-[11px] text-slate-400 mt-0.5 flex items-center gap-1">
+              <i class="fa-solid fa-circle-check text-emerald-400 text-[10px]"></i>
+              <span>Vacuum Standby</span>
+            </div>
+          </div>
+        </a>
+
+      </div>
+
+      <!-- Footer Quick Status -->
+      <div class="flex items-center justify-between text-[11px] text-slate-400 border-t border-slate-800/80 pt-2">
+        <span class="text-slate-400">Quick URL Scheme Ready</span>
+        <span class="text-amber-400/80 flex items-center gap-1">
+          <i class="fa-solid fa-info-circle"></i> iPad OS Integrated
+        </span>
+      </div>
+    </section>
+
+
+    <!-- ==========================================
+         4. BOTTOM-RIGHT: 7-DAY WEATHER FORECAST
+         ========================================== -->
+    <section class="glass-panel rounded-3xl p-5 md:p-6 flex flex-col justify-between relative overflow-hidden">
+      <!-- Section Header -->
+      <div class="flex items-center justify-between pb-2 border-b border-slate-800/80">
+        <div class="flex items-center space-x-2 text-sky-400 font-semibold text-xs md:text-sm tracking-wider uppercase">
+          <i class="fa-solid fa-calendar-week"></i>
+          <span>7-Day Weather Forecast</span>
+        </div>
+        <button onclick="fetchWeatherData()" class="text-slate-400 hover:text-sky-300 text-xs transition flex items-center gap-1">
+          <i class="fa-solid fa-arrows-rotate"></i> Refresh
+        </button>
+      </div>
+
+      <!-- 7-Day Forecast Items Container -->
+      <div id="forecastContainer" class="my-auto space-y-1.5 overflow-y-auto max-h-[220px] pr-1">
+        <div class="text-center text-slate-400 py-8 text-xs">Fetching 7-Day Forecast...</div>
+      </div>
+
+      <!-- Forecast Footer -->
+      <div class="flex items-center justify-between text-[11px] text-slate-500 border-t border-slate-800/80 pt-2">
+        <span>Powered by Open-Meteo API</span>
+        <span>Auto Updates Hourly</span>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Search City Modal -->
+  <div id="cityModal" class="hidden fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="glass-panel bg-slate-900/90 border border-slate-700 rounded-3xl p-6 max-w-sm w-full shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-magnifying-glass text-sky-400"></i> Change City
+        </h3>
+        <button onclick="toggleCityModal()" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+      <div class="space-y-3">
+        <input type="text" id="citySearchInput" placeholder="Enter City Name (e.g. London, Tokyo, Taipei)" class="w-full bg-slate-800/90 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-none focus:border-sky-500 font-medium">
+        <button onclick="searchCity()" class="w-full bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white py-2.5 rounded-xl text-xs font-bold tracking-wider uppercase transition shadow-lg shadow-sky-500/20">
+          Apply City
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* Global Location Variables */
+    let currentLat = 22.3193; // Default Hong Kong
+    let currentLon = 114.1694;
+    let currentCityName = "Hong Kong";
+    let wakeLock = null;
+
+    window.onload = function() {
+      // 1. Initialize Clock
+      updateClock();
+      setInterval(updateClock, 1000);
+
+      // 2. Fetch Initial Weather
+      getUserLocation();
+
+      // Auto Refresh Weather every 30 mins
+      setInterval(fetchWeatherData, 30 * 60 * 1000);
+    };
+
+    /* =========================================================================
+       1. CLOCK & BRITISH DATE LOGIC
+       ========================================================================= */
+    function updateClock() {
+      const now = new Date();
+
+      // Hours & Minutes
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // convert 0 to 12
+      const formattedHours = String(hours).padStart(2, '0');
+
+      document.getElementById('clockDisplay').innerText = `${formattedHours}:${minutes}`;
+      document.getElementById('ampmDisplay').innerText = ampm;
+
+      // Full Prominent Day Name (e.g., SATURDAY)
+      const days = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"];
+      document.getElementById('dayOfWeek').innerText = days[now.getDay()];
+
+      // British Format Date (e.g., "19 SEPT")
+      const dayNum = now.getDate();
+      const monthShortNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEPT", "OCT", "NOV", "DEC"];
+      const monthShort = monthShortNames[now.getMonth()];
+      
+      document.getElementById('britishDateDisplay').innerText = `${dayNum} ${monthShort}`;
+      document.getElementById('fullDateSub').innerText = `/ ${now.getFullYear()}`;
+    }
+
+    /* Screen Wake Lock API for iPad */
+    async function toggleWakeLock() {
+      try {
+        if ('wakeLock' in navigator) {
+          if (!wakeLock) {
+            wakeLock = await navigator.wakeLock.request('screen');
+            document.getElementById('wakeLockText').innerText = "Awake Active";
+            document.getElementById('wakeLockBtn').classList.add('bg-amber-500/20', 'border-amber-500/50');
+          } else {
+            await wakeLock.release();
+            wakeLock = null;
+            document.getElementById('wakeLockText').innerText = "Stay Awake";
+            document.getElementById('wakeLockBtn').classList.remove('bg-amber-500/20', 'border-amber-500/50');
+          }
+        } else {
+          alert("Screen Wake Lock API is not supported on this browser version. You can disable screen auto-lock in iPad Settings.");
         }
-        setInterval(updateClock, 1000);
-        updateClock();
+      } catch (err) {
+        console.log("Wake Lock error:", err);
+      }
+    }
 
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(e => console.log(e));
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
 
-        // 2. 香港天文台官方 API 直接串接（無跨域阻擋問題）
-        function getHKOWeather() {
-            const currentUrl = 'https://weather.gov.hk';
-            const forecastUrl = 'https://weather.gov.hk';
+    /* =========================================================================
+       2. APP LAUNCHER SHORTCUT FALLBACK HANDLER
+       ========================================================================= */
+    function handleAppLaunch(event, appUri, fallbackUrl) {
+      // Tries launching iPad App URI, falls back if opened in standard browser
+      setTimeout(() => {
+        window.location.href = fallbackUrl;
+      }, 1200);
+    }
 
-            // A. 讀取即時溫度與下雨狀況
-            fetch(currentUrl)
-                .then(res => res.json())
-                .then(data => {
-                    if(data.temperature && data.temperature.data) {
-                        document.getElementById('hk-temp').innerText = `${data.temperature.data[0].value}°`;
-                    }
-                    if(data.humidity && data.humidity.data) {
-                        document.getElementById('hk-humidity').innerText = `相對濕度: ${data.humidity.data[0].value}%`;
-                    }
-                    
-                    // 從天文台的天氣照片或文字報告中自動識別當前狀態（下雨、晴天等）
-                    let conditionText = "多雲";
-                    if (data.rainfall && data.rainfall.data && data.rainfall.data[0].max > 0) {
-                        conditionText = "有雨";
-                    } else if (data.icon && data.icon[0]) {
-                        // 簡單將天文台圖標轉換為常用文字
-                        const icon = data.icon[0];
-                        if (icon >= 50 && icon <= 54) conditionText = "有雨";
-                        else if (icon >= 62 && icon <= 65) conditionText = "少雲/晴朗";
-                        else conditionText = "陰天/多雲";
-                    }
-                    document.getElementById('hk-weather-text').innerText = conditionText;
+    /* =========================================================================
+       3. WEATHER & 7-DAY FORECAST LOGIC (Open-Meteo API)
+       ========================================================================= */
+    function getUserLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            currentLat = position.coords.latitude;
+            currentLon = position.coords.longitude;
+            currentCityName = "Current Location";
+            fetchWeatherData();
+          },
+          (error) => {
+            console.log("GPS Position unavailable, defaulting location:", error);
+            fetchWeatherData();
+          }
+        );
+      } else {
+        fetchWeatherData();
+      }
+    }
 
-                    // 天氣警告摘要
-                    const warningBox = document.getElementById('hk-warning');
-                    if(data.warningMessage && data.warningMessage.length > 0) {
-                        warningBox.innerText = `⚠️ ${data.warningMessage[0]}`;
-                    } else {
-                        warningBox.innerText = "✅ 當前無任何天氣警告";
-                    }
-                })
-                .catch(() => {
-                    document.getElementById('hk-weather-text').innerText = "連線稍候...";
-                });
+    async function fetchWeatherData() {
+      try {
+        document.getElementById('weatherCondition').innerText = "Updating Weather...";
 
-            // B. 讀取九天天氣預報（精選 4 天，完美填滿右下格）
-            fetch(forecastUrl)
-                .then(res => res.json())
-                .then(data => {
-                    if(data.weatherForecast) {
+        const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${currentLat}&longitude=${currentLon}&current_weather=true&hourly=relativehumidity_2m,precipitation_probability,uv_index&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto`;
+
+        const res = await fetch(apiUrl);
+        const data = await res.json();
+
+        updateCurrentWeatherUI(data);
+        updateForecastUI(data);
+      } catch (err) {
+        console.error("Weather fetch failed:", err);
+        document.getElementById('weatherCondition').innerText = "Weather Unavailable";
+      }
+    }
+
+    function updateCurrentWeatherUI(data) {
+      const current = data.current_weather;
+      const temp = Math.round(current.temperature);
+      const code = current.weathercode;
+      const wind = Math.round(current.windspeed);
+
+      document.getElementById('locationName').innerText = currentCityName;
+      document.getElementById('currentTemp').innerText = temp;
+      document.getElementById('feelsLikeTemp').innerText = `Feels like: ${temp}°C`;
+      document.getElementById('windSpeedVal').innerText = `${wind} km/h`;
+
+      const humidity = data.hourly?.relativehumidity_2m ? data.hourly.relativehumidity_2m[0] : 72;
+      document.getElementById('humidityVal').innerText = `${humidity}%`;
+
+      const precip = data.daily?.precipitation_probability_max ? data.daily.precipitation_probability_max[0] : 0;
+      document.getElementById('precipVal').innerText = `${precip}%`;
+
+      const uv = data.hourly?.uv_index ? Math.round(data.hourly.uv_index[0]) : 4;
+      document.getElementById('uvIndexVal').innerText = `${uv}`;
+
+      const meta = getWeatherMeta(code);
+      document.getElementById('weatherCondition').innerText = meta.label;
+      document.getElementById('weatherIconContainer').innerHTML = `<i class="${meta.icon}"></i>`;
+    }
+
+    function updateForecastUI(data) {
+      const container = document.getElementById('forecastContainer');
+      container.innerHTML = '';
+
+      if (!data.daily || !data.daily.time) {
+        container.innerHTML = `<div class="text-center text-slate-500 py-6 text-xs">Forecast data unavailable</div>`;
+        return;
+      }
+
+      const days = data.daily.time;
+      const maxTemps = data.daily.temperature_2m_max;
+      const minTemps = data.daily.temperature_2m_min;
+      const codes = data.daily.weathercode;
+      const precips = data.daily.precipitation_probability_max;
+
+      const weekdaysShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+      days.forEach((dateStr, idx) => {
+        const dateObj = new Date(dateStr);
+        const dayName = weekdaysShort[dateObj.getDay()];
+        const dayNum = dateObj.getDate();
+        const monthNum = dateObj.getMonth() + 1;
+        const isToday = idx === 0;
+
+        const maxT = Math.round(maxTemps[idx]);
+        const minT = Math.round(minTemps[idx]);
+        const precip = precips ? precips[idx] : 0;
+        const meta = getWeatherMeta(codes[idx]);
+
+        const row = document.createElement('div');
+        row.className = `p-2.5 rounded-2xl ${isToday ? 'bg-sky-500/15 border border-sky-500/30' : 'glass-tile'} flex items-center justify-between text-xs transition hover:border-slate-500/50`;
+
+        row.innerHTML = `
+          <div class="flex items-center space-x-2.5 min-w-[95px]">
+            <span class="font-bold ${isToday ? 'text-sky-300' : 'text-slate-200'}">${isToday ? 'Today' : dayName}</span>
+            <span class="text-[10px] text-slate-400">${dayNum}/${monthNum}</span>
+          </div>
+
+          <div class="flex items-center space-x-2 flex-1 justify-center">
+            <i class="${meta.icon} text-base"></i>
+            <span class="text-[11px] text-slate-300 hidden sm:inline">${meta.short}</span>
+          </div>
+
+          <div class="flex items-center space-x-3 justify-end min-w-[100px]">
+            <span class="text-[10px] text-sky-400/80 font-mono"><i class="fa-solid fa-droplet text-[9px]"></i> ${precip}%</span>
+            <div class="font-mono text-right">
+              <span class="font-bold text-white">${maxT}°</span>
+              <span class="text-slate-400 text-[10px]"> / ${minT}°</span>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(row);
+      });
+    }
+
+    function toggleCityModal() {
+      document.getElementById('cityModal').classList.toggle('hidden');
+    }
+
+    async function searchCity() {
+      const city = document.getElementById('citySearchInput').value.trim();
+      if (!city) return;
+
+      try {
+        const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`;
+        const res = await fetch(geoUrl);
+        const data = await res.json();
+
+        if (data.results && data.results.length > 0) {
+          const loc = data.results[0];
+          currentLat = loc.latitude;
+          currentLon = loc.longitude;
+          currentCityName = `${loc.name}, ${loc.country_code ? loc.country_code.toUpperCase() : ''}`;
+          fetchWeatherData();
+          toggleCityModal();
+        } else {
+          alert('City not found. Please check spelling.');
+        }
+      } catch (e) {
+        console.error(e);
+        alert('Error searching for city.');
+      }
+    }
+
+    function getWeatherMeta(code) {
+      if (code === 0) return { label: 'Clear Sky', short: 'Clear', icon: 'fa-solid fa-sun text-amber-400' };
+      if (code === 1 || code === 2) return { label: 'Partly Cloudy', short: 'Partly Cloudy', icon: 'fa-solid fa-cloud-sun text-sky-300' };
+      if (code === 3) return { label: 'Overcast', short: 'Overcast', icon: 'fa-solid fa-cloud text-slate-400' };
+      if (code >= 45 && code <= 48) return { label: 'Foggy', short: 'Fog', icon: 'fa-solid fa-smog text-slate-400' };
+      if (code >= 51 && code <= 55) return { label: 'Drizzle', short: 'Drizzle', icon: 'fa-solid fa-cloud-rain text-sky-400' };
+      if (code >= 61 && code <= 65) return { label: 'Rain Showers', short: 'Rain', icon: 'fa-solid fa-cloud-showers-heavy text-blue-400' };
+      if (code >= 80 && code <= 82) return { label: 'Heavy Showers', short: 'Heavy Rain', icon: 'fa-solid fa-cloud-showers-water text-blue-500' };
+      if (code >= 95) return { label: 'Thunderstorm', short: 'Thunderstorm', icon: 'fa-solid fa-bolt text-amber-300' };
+      return { label: 'Partly Cloudy', short: 'Cloudy', icon: 'fa-solid fa-cloud-sun text-sky-300' };
+    }
+  </script>
+</body>
+</html>
